@@ -1,4 +1,5 @@
-export * from "https://raw.githubusercontent.com/harmonyland/harmony/824e70c16efc4688a83a6c1a18b386a4df7ce8f3/mod.ts";
+export * from "https://raw.githubusercontent.com/harmonyland/harmony/b890958215c020d33866846510fc3e19f6295cec/mod.ts";
+export * from "https://raw.githubusercontent.com/harmonyland/harmony/b890958215c020d33866846510fc3e19f6295cec/src/types/gatewayResponse.ts";
 
 import {
 	ApplicationCommandInteraction,

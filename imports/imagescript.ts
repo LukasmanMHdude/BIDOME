@@ -1,1 +1,1 @@
-export * from "https://deno.land/x/imagescript@1.2.15/mod.ts";
+export * from "https://deno.land/x/imagescript@1.3.0/mod.ts";

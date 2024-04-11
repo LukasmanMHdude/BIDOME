@@ -14,8 +14,7 @@
 		"jsx": "react",
 		"jsxFactory": "BotUI.createElement",
 		"jsxFragmentFactory": "fragment",
-		"lib": ["dom", "esnext", "deno.window"],
-		"experimentalDecorators": true
+		"lib": ["dom", "esnext", "deno.window"]
 	},
 	"tasks": {
 		"run": "deno run --import-map=imports.json --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run index.ts",

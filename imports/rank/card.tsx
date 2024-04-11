@@ -1,10 +1,5 @@
-/** @jsx h */
-/** @jsxFrag Fragment */
-import {
-	Fragment,
-	h,
-	renderToString,
-} from "https://deno.land/x/jsx@v0.1.5/mod.ts";
+/** @jsxImportSource jsr:@mary/jsx */
+import type { JSXNode } from 'jsr:@mary/jsx';
 import { setup, tw } from "npm:twind";
 import { getStyleTag, virtualSheet } from "npm:twind/sheets";
 import * as colors from "npm:twind/colors";
@@ -285,7 +280,7 @@ export default async function Card(props: ComponentProps) {
         ${styleTag}
       </head>
       <body>
-        ${await renderToString(body)}
+        ${body}
       </body>
     </html>`;
 }

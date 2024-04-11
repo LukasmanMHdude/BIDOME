@@ -7,7 +7,7 @@ import {
 	people,
 	symbols,
 	travel,
-} from "https://deno.land/x/discord_emoji@v2.2.0/mod.ts";
+} from "https://deno.land/x/discord_emoji@v2.4.0/mod.ts";
 
 type EmojiKeys =
 	| keyof typeof activity

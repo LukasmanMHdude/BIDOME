@@ -1,6 +1,6 @@
 import { Embed, EmbedPayload, Guild, Member, User } from "./harmony.ts";
 import { loopFilesAndReturn } from "./tools.ts";
-import { parse } from "https://deno.land/std@0.195.0/yaml/mod.ts";
+import { parse } from "jsr:@std/yaml";
 
 interface RecursiveRecord {
 	[key: string]: string | string[] | RecursiveRecord;

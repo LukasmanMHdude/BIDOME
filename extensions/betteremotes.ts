@@ -319,6 +319,14 @@ export default class BetterEmotes extends Extension {
 			await this.saveCache();
 		}
 
+		if (
+			msg.author.bot ||
+			msg.guild == undefined ||
+			!msg.content.includes(":")
+		) {
+			return;
+		}
+
 		if (Deno.env.get("IS_DEV") == "true") return;
 		if (!(await hasNQNBeta(msg.guild!))) return;
 		if (
@@ -331,7 +339,13 @@ export default class BetterEmotes extends Extension {
 		)
 			return;
 
-		const webhooks = await msg.channel.fetchWebhooks();
+		let webhooks: Webhook[] = [];
+
+		try {
+			webhooks = await msg.channel.fetchWebhooks();
+		} catch {
+			return;
+		}
 
 		// if (msg.messageReference != undefined) {
 		// 	const repliedToMsg = msg.mentions.message;
@@ -357,16 +371,6 @@ export default class BetterEmotes extends Extension {
 		// 		}
 		// 	}
 		// }
-
-		if (Deno.env.get("IS_DEV") == "true") return;
-
-		if (
-			msg.author.bot ||
-			msg.guild == undefined ||
-			!msg.content.includes(":")
-		) {
-			return;
-		}
 
 		const emojiRegex = /(?!<a?):[a-zA-Z0-9_]+:(?![0-9]+>)/g;
 		const emojis = msg.content.match(emojiRegex);

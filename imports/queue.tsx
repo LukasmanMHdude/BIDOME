@@ -13,13 +13,13 @@ import {
 	Message,
 	VoiceChannel,
 	VoiceState,
+	GatewayResponse
 } from "./harmony.ts";
 import { Cluster, Player, PlayerEvents } from "./lavadeno.ts";
 import { formatMs, removeDiscordFormatting, shuffleArray } from "./tools.ts";
 import { nodes } from "./nodes.ts";
 import { getEmojiByName } from "./emoji.ts";
 import { supabase } from "supabase";
-import { GatewayResponse } from "https://raw.githubusercontent.com/harmonyland/harmony/824e70c16efc4688a83a6c1a18b386a4df7ce8f3/src/types/gatewayResponse.ts";
 
 let client: CommandClient;
 
