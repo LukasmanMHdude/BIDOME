@@ -8,12 +8,12 @@ import {
 	Embed,
 	fragment,
 	Gateway,
+	GatewayResponse,
 	Guild,
 	Member,
 	Message,
 	VoiceChannel,
 	VoiceState,
-	GatewayResponse
 } from "./harmony.ts";
 import { Cluster, Player, PlayerEvents } from "./lavadeno.ts";
 import { formatMs, removeDiscordFormatting, shuffleArray } from "./tools.ts";

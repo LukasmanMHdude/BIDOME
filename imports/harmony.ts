@@ -7,7 +7,7 @@ import {
 } from "./harmony.ts";
 
 export interface ApplicationCommand extends ApplicationCommandPartial {
-	handler: (i: ApplicationCommandInteraction) => Promise<void> | void;
+	handler: (i: ApplicationCommandInteraction) => Promise<unknown> | unknown;
 }
 
 // For local harmony development:

@@ -1,5 +1,5 @@
 /** @jsxImportSource jsr:@mary/jsx */
-import type { JSXNode } from 'jsr:@mary/jsx';
+import type { JSXNode } from "jsr:@mary/jsx";
 import { setup, tw } from "npm:twind";
 import { getStyleTag, virtualSheet } from "npm:twind/sheets";
 import * as colors from "npm:twind/colors";
