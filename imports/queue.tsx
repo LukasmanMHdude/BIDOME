@@ -8,7 +8,6 @@ import {
 	Embed,
 	fragment,
 	Gateway,
-	GatewayResponse,
 	Guild,
 	Member,
 	Message,
@@ -459,7 +458,9 @@ export const initLava = (bot: CommandClient) => {
 						BigInt(bot.shards.cachedShardCount ?? 1),
 				);
 				const shard = bot.shards.get(shardID) as Gateway;
-				shard.send(payload as GatewayResponse);
+				// Harmony's JSR package doesn't export GatewayResponse so I need to use any - Bloxs
+				// deno-lint-ignore no-explicit-any
+				shard.send(payload as any);
 			},
 		},
 	});

@@ -1,5 +1,5 @@
-export * from "https://raw.githubusercontent.com/harmonyland/harmony/b890958215c020d33866846510fc3e19f6295cec/mod.ts";
-export * from "https://raw.githubusercontent.com/harmonyland/harmony/b890958215c020d33866846510fc3e19f6295cec/src/types/gatewayResponse.ts";
+export * from "jsr:@harmony/harmony";
+export * from "jsr:@harmony/harmony";
 
 import {
 	ApplicationCommandInteraction,
