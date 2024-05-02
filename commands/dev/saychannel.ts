@@ -36,7 +36,7 @@ export default class SayChannel extends Command {
 				});
 			}
 
-			await channel.send(ctx.argString);
+			await channel.send(message.join(" "));
 		}
 	}
 }
