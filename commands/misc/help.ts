@@ -206,10 +206,16 @@ export default class Help extends Command {
 				const categorydata = choice.toLowerCase() === "uncategorized"
 					? uncategorizedCmds
 					: ctx.client.commands.category(choice).array();
-				const description = categorydata
+				let description = categorydata
 					.sort()
 					.map((cmd) => `${format(cmd.name)}`)
 					.join("\n - ");
+				
+				if (choice.toLowerCase() == "music") {
+					description += `\n - Shuffleplay`
+				}
+
+				description = description.split("\n").sort().join("\n");
 
 				await message.edit({
 					components: [],

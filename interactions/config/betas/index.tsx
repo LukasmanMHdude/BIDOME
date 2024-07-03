@@ -8,7 +8,6 @@ import {
 	MessageComponentInteraction,
 } from "harmony";
 import { createEmbedFromLangData, getString, getUserLanguage } from "i18n";
-import { supabase } from "supabase";
 
 export async function button(i: MessageComponentInteraction) {
 	const lang = await getUserLanguage(i.user.id);

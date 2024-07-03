@@ -67,17 +67,6 @@ export const format = (name: string): string => {
 	}`;
 };
 
-export const removeDiscordFormatting = (text: string): string => {
-	return removeDiscordCodeBlocks(text)
-		.replace(/\_/, "\\_")
-		.replace(/\*/, "\\*")
-		.replace(/\[/, "\\[")
-		.replace(/\]/, "\\]")
-		.replace(/\)/, "\\)")
-		.replace(/\(/, "\\(")
-		.replace(/\~/, "\\~");
-};
-
 export const removeDiscordCodeBlocks = (text: string): string => {
 	return text.replace(/`/gi, "\\`");
 };
