@@ -1,6 +1,6 @@
 import scss from "https://deno.land/x/denosass@1.0.6/mod.ts";
 import { bundle } from "https://deno.land/x/emit@0.31.5/mod.ts";
-import tailwindCss, { Config } from "npm:tailwindcss@3.3.5";
+import tailwindCss, { type Config } from "npm:tailwindcss@3.3.5";
 import postcss from "npm:postcss@8.4.31";
 import cssnano from "npm:cssnano@6.0.1";
 import autoprefixer from "npm:autoprefixer@10.3.1";

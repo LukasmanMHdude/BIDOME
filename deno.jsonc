@@ -10,7 +10,17 @@
 		"lineWidth": 80
 	},
 
-	"lint": { "rules": { "tags": ["fresh", "recommended"] } },
+	"lint": {
+		"rules": {
+			"tags": ["fresh", "recommended"],
+			"include": [
+				"camelcase",
+				"no-sync-fn-in-async-fn",
+				"single-var-declarator",
+				"verbatim-module-syntax"
+			]
+		}
+	},
 
 	"tasks": {
 		// Global

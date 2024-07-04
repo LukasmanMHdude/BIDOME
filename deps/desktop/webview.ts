@@ -1,1 +1,1 @@
-export * from "https://deno.land/x/webview@0.7.6/mod.ts";
+export * from "jsr:@webview/webview@0.8.0";

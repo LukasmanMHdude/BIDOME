@@ -1,28 +1,38 @@
 export class Command {
-	// General
-	public name = "";
-	public description?: string;
+	public name: string;
 	public aliases: string[] = [];
+	public description: string | undefined = undefined;
+	public usage: string[] | undefined = undefined;
+	// TODO: Figure out what the types are going to be for this
+	public args: { optional?: boolean }[] = [];
+	public permissions: unknown = {};
+	public executor: () => void = () => {};
 
-	// Discord specific
-	public slashOnly = false;
-	public textOnly = false;
+	constructor(name: string) {
+		this.name = name;
+	}
 
-	// Perm specific
-	public ownerOnly = false;
-	/** Required perms to run command */
-	public userPerms = [];
-	/** Required perms to run command */
-	public botPerms = [];
+	public setAliases(aliases: string[]) {
+		this.aliases = aliases;
+	}
 
-	// Platform specific
-	public discordOnly = false;
-	public guildedOnly = false;
+	public setUsage(usage: string[]) {
+		this.usage = usage;
+	}
 
-	/** Return false to cancel command execution */
-	public async beforeExecute(): Promise<void | false> {}
+	public setDescription(description: string) {
+		this.description = description;
+	}
 
-	public async execute(): Promise<void> {}
+	public setPermissions(permissions: unknown) {
+		this.permissions = permissions;
+	}
 
-	public async afterExecute(): Promise<void> {}
+	public addArgument(arg: { optional?: boolean}) {
+		this.args.push(arg);
+	}
+
+	public setExecutor(func: () => void) {
+		this.executor = func;
+	}
 }

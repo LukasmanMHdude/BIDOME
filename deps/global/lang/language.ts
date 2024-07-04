@@ -1,10 +1,69 @@
 import { parse } from "$std/yaml/mod.ts";
-import { getLocale } from "./index.ts";
+import { getLocale, type RecursiveRecord } from "./index.ts";
 
-// For some reason doing this as a `type` has an error - Bloxs
-export interface RecursiveRecord {
-	[key: string]: RecursiveRecord | string | string[];
-}
+export const tokenizeFiles = (
+	langFiles: { name: string; content: RecursiveRecord }[]
+) => {
+	const tokenizedLangFiles: { key: string; value: string | string[] }[] = [];
+
+	for (const file of langFiles) {
+		const recursiveTokenize = (record: RecursiveRecord, prefix = "") => {
+			for (const [key, value] of Object.entries(record)) {
+				if (typeof value === "object") {
+					recursiveTokenize(value as RecursiveRecord, `${prefix}${key}.`);
+				} else {
+					tokenizedLangFiles.push({
+						key: `${prefix}${key}`,
+						value,
+					});
+				}
+			}
+		};
+
+		let prefix = "";
+
+		for (const segment of file.name
+			.substring(2, file.name.length - ".yml".length)
+			.split("/")) {
+			if (!segment.startsWith("_")) {
+				prefix += `${segment}.`;
+			}
+		}
+
+		recursiveTokenize(file.content, prefix);
+	}
+
+	return tokenizedLangFiles;
+};
+
+const generateTypes = async (keys: string[]) => {
+	const keysList = new Set<string>();
+
+	for (const key of keys) {
+		const trimToken = (token: string) => {
+			const tokenSplit = token.split(".");
+
+			if (tokenSplit.length != 0 && tokenSplit[0] != "") {
+				keysList.add(tokenSplit.join("."));
+
+				trimToken(tokenSplit.slice(0, -1).join("."));
+			}
+		};
+
+		keysList.add(key);
+		trimToken(key);
+	}
+
+	let code = `export type LangKeys =\n`;
+
+	for (const key of Array.from(keysList).sort()) {
+		code += `\t| "${key}"\n`;
+	}
+
+	code = `${code.substring(0, code.length - 1)};\n`;
+
+	await Deno.writeTextFile("./deps/global/lang/types/_keys.ts", code);
+};
 
 export class Language {
 	private keys: RecursiveRecord = {};
@@ -29,7 +88,7 @@ export class Language {
 		public readonly locale: string,
 		public readonly englishName: string,
 		public readonly nativeName: string,
-		private readonly langFiles: { name: string; content: string }[]
+		langFiles: { name: string; content: string }[]
 	) {
 		// I'm aware I'm converting this from yaml into json into strings just to reconvert it back into json
 		// but it's much easier to do it this way as then I don't need to deal with as many name collisions - Bloxs
@@ -47,33 +106,13 @@ export class Language {
 			}
 		}
 
-		const tokenizedLangFiles: { key: string; value: string | string[] }[] = [];
+		const tokenizedLangFiles = tokenizeFiles(parsedLangFiles);
 
-		for (const file of parsedLangFiles) {
-			const recursiveTokenize = (record: RecursiveRecord, prefix = "") => {
-				for (const [key, value] of Object.entries(record)) {
-					if (typeof value === "object") {
-						recursiveTokenize(value as RecursiveRecord, `${prefix}${key}.`);
-					} else {
-						tokenizedLangFiles.push({
-							key: `${prefix}${key}`,
-							value,
-						});
-					}
-				}
-			};
-
-			let prefix = "";
-
-			for (const segment of file.name
-				.substring(2, file.name.length - ".yml".length)
-				.split("/")) {
-				if (!segment.startsWith("_")) {
-					prefix += `${segment}.`;
-				}
-			}
-
-			recursiveTokenize(file.content, prefix);
+		if (
+			locale === "en-US" &&
+			Deno.args.map((a) => a.toLowerCase()).includes("--generate-types")
+		) {
+			generateTypes(tokenizedLangFiles.map((file) => file.key));
 		}
 
 		for (const { key, value } of tokenizedLangFiles) {
@@ -110,7 +149,7 @@ export class Language {
 	public getKey(
 		key: string,
 		record = this.keys
-	): string | string[] | RecursiveRecord | undefined {
+	): string | string[] | RecursiveRecord | RecursiveRecord[] {
 		const [nextKey, ...rest] = key.split(".");
 
 		if (rest.length === 0) {

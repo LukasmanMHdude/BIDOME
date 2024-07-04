@@ -1,4 +1,4 @@
-import { Webview } from "https://deno.land/x/webview@0.7.6/mod.ts";
+import { Webview } from "../deps/desktop/webview.ts";
 import { renderRoute } from "./utils/prebuild/routes.ts";
 import { getConfig } from "./utils/config.ts";
 
