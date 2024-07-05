@@ -9,7 +9,7 @@ import {
 } from "harmony";
 import { queues } from "queue";
 import { getEmojiByName } from "emoji";
-import { formatMs, removeDiscordFormatting } from "tools";
+import { formatMs } from "tools";
 
 export default class Queue extends Command {
 	name = "queue";
@@ -68,21 +68,14 @@ export default class Queue extends Command {
 							.slice(0, 10)
 							.map(
 								({ title, url }, index) =>
-									`${emojiMap[index]} [${
-										removeDiscordFormatting(
-											title,
-										)
-									}](${url})`,
+									`${emojiMap[index]} [${title}](${url})`
 							)
 							.join("\n"),
 						footer: {
 							icon_url: ctx.author.avatarURL(),
-							text:
-								`Songs in queue: ${queueEntries.length} | Length: ${
-									formatMs(
-										queue.queueLength,
-									)
-								}`,
+							text: `Songs in queue: ${
+								queueEntries.length
+							} | Length: ${formatMs(queue.queueLength)}`,
 						},
 					}).setColor("random"),
 				],
