@@ -13,6 +13,7 @@ import { Track } from "lavadeno";
 import { getEmojiByName } from "emoji";
 import { shuffleArray } from "tools";
 import { getEmote } from "i18n";
+import { load } from "https://deno.land/std@0.186.0/yaml/_loader/loader.ts";
 
 const shuffleCommands = ["shuffleplay", "sp"];
 
@@ -79,10 +80,14 @@ export default class Play extends Command {
 					/(https?:\/\/)?(www\.)?([a-zA-Z0-9][a-zA-Z0-9\-]{1,}[a-zA-Z0-9]\.?){1,}(\.[a-zA-Z]{2})?\.[a-zA-Z]{2,63}/i.test(
 						ctx.argString
 					);
-				const { data, loadType } = await lavaCluster.api.loadTracks(
+
+				const searchString =
 					isLink || /(yt|sc)search\:/i.test(ctx.argString)
 						? ctx.argString
-						: `ytsearch:${ctx.argString}`
+						: `ytsearch:${ctx.argString}`;
+
+				const { data, loadType } = await lavaCluster.api.loadTracks(
+					searchString
 				);
 
 				if (loadType == "error" || loadType == "empty") {

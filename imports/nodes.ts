@@ -21,9 +21,6 @@ export const nodes: ClusterNodeOptions[] = new Array(nodesCount)
 				tries: Infinity,
 				delay: 5 * 1000,
 			},
-			resuming: {
-				timeout: 60 * 1000,
-			},
 			clientName: "Bidome",
 		},
 	}));
