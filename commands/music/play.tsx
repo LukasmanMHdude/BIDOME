@@ -13,7 +13,6 @@ import { Track } from "lavadeno";
 import { getEmojiByName } from "emoji";
 import { shuffleArray } from "tools";
 import { getEmote } from "i18n";
-import { load } from "https://deno.land/std@0.186.0/yaml/_loader/loader.ts";
 
 const shuffleCommands = ["shuffleplay", "sp"];
 
