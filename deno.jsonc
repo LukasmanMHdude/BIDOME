@@ -1,6 +1,14 @@
 {
+	"name": "@studios/bidome",
+	"version": "3.0.0",
 	"nodeModulesDir": true,
-	"compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
+
+	"workspaces": [
+		"./src/bot",
+		"./src/dashboard",
+		// TODO: Add custom dependencies here
+		"./src/deps/commander"
+	],
 
 	"fmt": {
 		"indentWidth": 4,
@@ -20,68 +28,5 @@
 				"verbatim-module-syntax"
 			]
 		}
-	},
-
-	"tasks": {
-		// Global
-		"lint": "deno task bot:lint && deno task dash:lint && deno task desk:lint",
-		"fmt": "deno task bot:fmt && deno task dash:fmt && deno task desk:fmt",
-		"check": "deno task bot:check && deno task dash:check && deno task desk:check && deno task check:files",
-		"check:files": "deno check --config=deno.jsonc **/*.ts && deno check --config=deno.jsonc **/*.tsx",
-
-		// Bot
-		"bot:check": "deno fmt --config=deno.jsonc --check --ignore=dashboard/,desktop/ && deno task bot:lint",
-		"bot:lint": "deno lint --config=deno.jsonc --unstable --ignore=dashboard/,desktop/",
-		"bot:fmt": "deno fmt --config=deno.jsonc --unstable --ignore=dashboard/,desktop/",
-
-		// Dashboard
-		"dash:check": "deno fmt --config=deno.jsonc --check --ignore=bot/,desktop/ && deno task dash:lint",
-		"dash:lint": "deno lint --config=deno.jsonc --unstable --ignore=bot/,desktop/",
-		"dash:fmt": "deno fmt --config=deno.jsonc --unstable --ignore=bot/,desktop/",
-		"dash:dev": "deno run --config=deno.jsonc -A --unstable --watch=dashboard/static/,dashboard/routes/,assets/ ./dashboard/dev.ts",
-		"dash:build": "deno run --config=deno.jsonc -A --unstable ./dashboard/dev.ts build",
-		"dash:preview": "deno run --config=deno.jsonc -A --unstable ./dashboard/main.ts",
-		"dash:upgrade": "deno run --config=deno.jsonc -A -r https://fresh.deno.dev/update ./",
-
-		// Desktop
-		"desk:check": "deno fmt --config=deno.jsonc --check --ignore=bot/ && deno task desk:lint",
-		"desk:lint": "deno lint --config=deno.jsonc --unstable --ignore=bot/,dashboard/",
-		"desk:fmt": "deno fmt --config=deno.jsonc --unstable --ignore=bot/,dashboard/",
-		"desk:dev": "deno task desk:rebuild && deno run --config=deno.jsonc -A --unstable ./desktop/index.ts",
-
-		/// Compilation
-		"desk:rebuild": "rm -rf desktop/dist && deno run --config=deno.jsonc -A --unstable --allow-read --allow-write --allow-run ./desktop/prebuild.ts",
-		"desk:rebuild:watch": "deno run --config=deno.jsonc -A --unstable --allow-read --allow-write --allow-run --watch=./desktop/routes ./desktop/prebuild.ts",
-		"desk:build": "deno task desk:rebuild && deno task desk:build:linux && deno task desk:build:windows",
-		"desk:build:linux": "deno compile --config=deno.jsonc -A --unstable --output=desktop/dist/linux/Bidome-Desktop --target=x86_64-unknown-linux-gnu ./desktop/index.ts",
-		"desk:build:windows": "deno compile --config=deno.jsonc -A --unstable --output=desktop/dist/windows/Bidome-Desktop.exe --target=x86_64-pc-windows-msvc --no-terminal ./desktop/index.ts",
-
-		"desk:build-dev": "deno task desk:rebuild && deno task desk:build-dev:linux && deno task desk:build-dev:windows",
-		"desk:build-dev:linux": "deno compile --config=deno.jsonc -A --unstable --output=desktop/dist/linux/Bidome-Desktop-Dev --target=x86_64-unknown-linux-gnu ./desktop/index.ts",
-		"desk:build-dev:windows": "deno compile --config=deno.jsonc -A --unstable --output=desktop/dist/windows/Bidome-Desktop-Dev.exe --target=x86_64-pc-windows-msvc ./desktop/index.ts"
-	},
-	"imports": {
-		"@/": "./",
-		"$std/": "https://deno.land/std@0.206.0/",
-
-		// Bot
-		"$discord": "./deps/bot/platforms/discord.ts",
-		"$guilded": "./deps/bot/platforms/guilded.ts",
-		"$twitch": "./deps/bot/platforms/twitch.ts",
-
-		// Dashboard
-		"$fresh/": "https://deno.land/x/fresh@1.6.0/",
-		"preact": "https://esm.sh/preact@10.19.2",
-		"preact/": "https://esm.sh/preact@10.19.2/",
-		"preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
-		"@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
-		"@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
-		"@unocss/core": "https://esm.sh/@unocss/core@0.56.5",
-		"@unocss/preset": "https://esm.sh/@unocss/preset-uno@0.56.5",
-
-		// Desktop
-		"$webview": "./deps/desktop/webview.ts"
-	},
-
-	"exclude": ["**/_fresh/*"]
+	}
 }

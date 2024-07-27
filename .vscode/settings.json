@@ -1,20 +1,33 @@
 {
 	"deno.enable": true,
-	"deno.lint": true,
 	"deno.unstable": true,
 	"deno.cacheOnSave": true,
 	"deno.config": "./deno.jsonc",
 	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "denoland.vscode-deno",
 	"deno.suggest.imports.autoDiscover": true,
 	"deno.suggest.imports.hosts": {
 		"https://deno.land": true
+	},
+	"deno.lint": true,
+	"editor.defaultFormatter": "denoland.vscode-deno",
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "denoland.vscode-deno"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "denoland.vscode-deno"
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "denoland.vscode-deno"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "denoland.vscode-deno"
+	},
+	"[yaml]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[github-actions-workflow]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"workbench.iconTheme": "vscode-icons",
-	"[yaml]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	}
+	"css.customData": [".vscode/tailwind.json"]
 }

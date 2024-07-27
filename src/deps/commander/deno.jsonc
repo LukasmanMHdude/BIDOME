@@ -1,0 +1,16 @@
+{
+	"name": "@studios/commander",
+	"version": "1.0.0",
+	"exports": {
+		".": "./index.ts",
+		"./command": "./src/command.ts",
+		"./commander": "./src/commander.ts",
+		"./subcommand": "./src/subcommand.ts"
+	},
+	"imports": {
+		"@harmony/harmony": "jsr:@harmony/harmony@2.9.1"
+	},
+	"tasks": {
+		"publish:test": "deno publish --dry-run --allow-dirty"
+	}
+}

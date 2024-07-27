@@ -16,6 +16,12 @@ body:
           required: true
         - label: "This is not a security vulnerability (Please disclose those to us directly rather than via issue)"
           required: true
+        - label: "I am checking these buttons without reading them"
+          required: false
+        - label: "This is an actual bug and not a feature request"
+          required: true
+        - label: "This does not persist to localizations (Please report those on Crowdin)"
+          required: true
 
   - type: "dropdown"
     id: "platform"
@@ -25,7 +31,6 @@ body:
       multiple: true
       options:
         - "Discord bot"
-        - "Guilded bot"
         - "Dashboard"
     validations:
       required: true
@@ -37,3 +42,21 @@ body:
       placeholder: "This command <command> returns the wrong response"
     validations:
       required: true
+
+  - type: "textarea"
+    attributes:
+      label: "Steps to reproduce"
+      description: "Please provide a step by step guide on how to reproduce the issue"
+      placeholder: "1. Run command <command>\n2. See response <response>"
+    validations:
+      required: true
+  
+  - type: "textarea"
+    attributes:
+      label: "Expected behavior"
+      description: "What should happen when the steps are followed"
+      placeholder: "The bot should respond with <response>"
+    validations:
+      required: true
+
+  

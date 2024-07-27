@@ -8,8 +8,5 @@ contact_links:
     url: "https://crowdin.com/project/bidome"
 
   - name: "Discord Server"
-    about: "Use this for general discussion and/or reporting Security Vulnerabilities"
+    about: "Use this for general discussion, reporting offensive content, and/or reporting Security Vulnerabilities"
     url: "https://discord.gg/yrwUpMcfcR"
-  - name: "Guilded Server"
-    about: "Use this for general discussion and/or reporting Security Vulnerabilities"
-    url: "https://www.guilded.gg/i/k1bRxyyp?r=ndlwkYR4"
