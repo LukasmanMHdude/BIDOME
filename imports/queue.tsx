@@ -85,13 +85,15 @@ export class ServerQueue {
 					length: this.queue[0].msLength,
 				};
 
-				await supabase
-					.from("music_notifications")
-					.upsert(dbData, {
-						onConflict: "server_id",
-						ignoreDuplicates: false,
-					})
-					.select("*");
+				if (Deno.env.get("DISABLE_UNDOCUMENTED_FEATURES") != "true") {
+					await supabase
+						.from("music_notifications")
+						.upsert(dbData, {
+							onConflict: "server_id",
+							ignoreDuplicates: false,
+						})
+						.select("*");
+				}
 			}
 
 			if (setAsSpeaker && this.firstSong) {
@@ -224,10 +226,12 @@ export class ServerQueue {
 
 		this.player.voice.disconnect();
 
-		await supabase
-			.from("music_notifications")
-			.delete()
-			.eq("server_id", this.guildId);
+		if (Deno.env.get("DISABLE_UNDOCUMENTED_FEATURES") != "true") {
+			await supabase
+				.from("music_notifications")
+				.delete()
+				.eq("server_id", this.guildId);
+		}
 	}
 
 	private async makeBotSpeak(channelObject: VoiceChannel) {

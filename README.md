@@ -1,4 +1,6 @@
 # Bidome
+> [!NOTE]
+> You are currently viewing the stable and public release of Bidome. To view the currently ongoing rewrite check out the [v-alyx branch](https://github.com/Wave-Studio/BIDOME/tree/v-alyx)
 
 ## What is Bidome?
 
@@ -27,10 +29,19 @@ selfhost then follow the guide below:
 1. Copy the `.env.example` file over to `.env`
 1. Set up a lavalink node and place the credentials into `.env`
 1. Set the Supabase URL and secret_role values into `.env`
-1. Create the tables present in `assets/db/database.types.ts` (Info on how to do
-   that soon:tm:)
+1. When creating tables in Supabase ensure that:
+	- Realtime & RLS are enabled for each table
+	- `Is Unique` & `Is Identity` are enabled for each primary value
+1. Create the tables that Bidome uses:
+	1. servers
+		- ![Picture of the database config](./assets/images/readme/servers.png)
+		- For column settings every row that has null as the default value has `Is Nullable` enabled
+		- `prefix` has `Define as Array` enabled
+	1. reminders
+		- ![Picture of the database config](./assets/images/readme/reminders.png)
+		- `future_sends` has `Define as Array` enabled
 1. Enable the `presence`, `message content`, and `server members` intent on the
    Discord Dashboard
 1. Run the bot
-   - To use the Crash handler run `deno task runProd`
-   - To not use the Crash handler run `deno task run`
+   - To use the automatic Crash handler run `deno task runProd`
+   - To not use the automatic Crash handler run `deno task run`
