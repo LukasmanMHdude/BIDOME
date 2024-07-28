@@ -27,8 +27,8 @@ selfhost then follow the guide below:
 ### Steps
 
 1. Copy the `.env.example` file over to `.env`
-1. Set up a lavalink node and place the credentials into `.env`
-1. Set the Supabase URL and secret_role values into `.env`
+1. Set up a Lavalink node ([Guide](https://lavalink.dev/getting-started/index.html)) and place the credentials into `.env`
+1. Create a Supabase project and set the Supabase URL and secret_role values into `.env`
 1. When creating tables in Supabase ensure that:
 	- Realtime & RLS are enabled for each table
 	- `Is Unique` & `Is Identity` are enabled for each primary value
