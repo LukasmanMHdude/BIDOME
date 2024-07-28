@@ -36,6 +36,7 @@ selfhost then follow the guide below:
 	1. servers
 		- ![Picture of the database config](./assets/images/readme/servers.png)
 		- For column settings every row that has null as the default value has `Is Nullable` enabled
+		- For columns that are cut off in the picture you can skip them other than `free_nitro_emotes`
 		- `prefix` has `Define as Array` enabled
 	1. reminders
 		- ![Picture of the database config](./assets/images/readme/reminders.png)
