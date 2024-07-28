@@ -215,7 +215,7 @@ export default class Help extends Command {
 					description += `\n - Shuffleplay`
 				}
 
-				description = description.split("\n").sort().join("\n");
+				description = ` - ${description}`.split("\n").sort().join("\n");
 
 				await message.edit({
 					components: [],
@@ -228,7 +228,7 @@ export default class Help extends Command {
 							title: `${format(choice)} Commands`,
 							description: categorydata.length < 1
 								? "I couldn't seem to find that category!"
-								: "```\n - " + description + "\n```",
+								: "```\n" + description + "\n```",
 							footer: {
 								text:
 									`Need help with something? Check out our discord using ${ctx.prefix}discord`,
