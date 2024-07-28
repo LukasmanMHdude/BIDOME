@@ -7,11 +7,34 @@ import {
 
 export default class Dice extends Command {
 	name = "dice";
-	aliases = ["diceroll", "rolladice"];
+	aliases = ["diceroll", "rolladice", "roll"];
 	category = "fun";
-	usage = "Dice";
+	usage = "Dice [size]";
 	description = "Roll a Dice";
 	async execute(ctx: CommandContext) {
+		if (ctx.argString != "") {
+			const size = parseInt(ctx.argString);
+			if (!isNaN(size)) {
+				await ctx.message.reply(undefined, {
+					embeds: [
+						new Embed({
+							author: {
+								name: "Bidome bot",
+								icon_url: ctx.message.client.user!.avatarURL(),
+							},
+							title: "Dice roll",
+							description: `The dice rolled a \`${
+								Math.floor(Math.random() * (size - 1 + 1)) + 1
+							}\``,
+						}).setColor("random"),
+					],
+					components: [],
+				});
+
+				return;
+			}
+		}
+
 		const now = Date.now();
 		const message = await ctx.message.reply(undefined, {
 			embeds: [
@@ -54,7 +77,7 @@ export default class Dice extends Command {
 				isMessageComponentInteraction(i) &&
 				i.customID.endsWith(`-${now}`) &&
 				i.user.id === ctx.author.id,
-			30 * 1000,
+			30 * 1000
 		);
 		if (!selected[0]) {
 			await message.edit(undefined, {
