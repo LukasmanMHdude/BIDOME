@@ -75,8 +75,7 @@ let reconnectHandler: number | undefined;
 bot.on("gatewayError", (err) => {
 	console.log("Gateway error occured", err);
 	if (
-		err.message ==
-		"Error: failed to lookup address information: Temporary failure in name resolution"
+		err.message.startsWith("NetworkError")
 	) {
 		console.log("Error resolving DNS, attempting Automatic reconnects");
 		if (reconnectHandler == undefined) {
