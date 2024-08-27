@@ -66,9 +66,14 @@ export class ServerQueue {
 	) {
 		this.guildId = this.guild.id;
 
-		this.player =
-			lavaCluster.players.resolve(this.guildId) ??
-			lavaCluster.players.create(this.guildId);
+		try {
+			this.player = lavaCluster.players.resolve(this.guildId)!;
+		} catch {
+			// Ignore error
+		}
+
+		this.player ??= lavaCluster.players.create(this.guildId);
+		
 		this.player.voice.connect(this.channel, {
 			deafened: true,
 		});
