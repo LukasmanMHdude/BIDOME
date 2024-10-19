@@ -39,7 +39,9 @@ export default class Play extends Command {
 				],
 			});
 		} else {
-			const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
+			const botState = await ctx.guild!.voiceStates.get(
+				ctx.client.user!.id,
+			);
 			if (
 				queues.has(ctx.guild!.id) &&
 				(botState == undefined || botState.channel == undefined)
@@ -57,7 +59,8 @@ export default class Play extends Command {
 								icon_url: ctx.client.user!.avatarURL(),
 							},
 							title: "Unable to play",
-							description: "Please join a voice channel before playing!",
+							description:
+								"Please join a voice channel before playing!",
 						}).setColor("red"),
 					],
 				});
@@ -76,9 +79,10 @@ export default class Play extends Command {
 				});
 
 				const isLink =
-					/(https?:\/\/)?(www\.)?([a-zA-Z0-9][a-zA-Z0-9\-]{1,}[a-zA-Z0-9]\.?){1,}(\.[a-zA-Z]{2})?\.[a-zA-Z]{2,63}/i.test(
-						ctx.argString
-					);
+					/(https?:\/\/)?(www\.)?([a-zA-Z0-9][a-zA-Z0-9\-]{1,}[a-zA-Z0-9]\.?){1,}(\.[a-zA-Z]{2})?\.[a-zA-Z]{2,63}/i
+						.test(
+							ctx.argString,
+						);
 
 				const searchString =
 					isLink || /(yt|sc)search\:/i.test(ctx.argString)
@@ -86,7 +90,7 @@ export default class Play extends Command {
 						: `ytsearch:${ctx.argString}`;
 
 				const { data, loadType } = await lavaCluster.api.loadTracks(
-					searchString
+					searchString,
 				);
 
 				if (loadType == "error" || loadType == "empty") {
@@ -98,7 +102,8 @@ export default class Play extends Command {
 									icon_url: ctx.client.user!.avatarURL(),
 								},
 								title: "Unable to find songs!",
-								description: "No songs were found for that result!",
+								description:
+									"No songs were found for that result!",
 							}).setColor("red"),
 						],
 					});
@@ -113,9 +118,14 @@ export default class Play extends Command {
 
 						let thumbnail: undefined | string = undefined;
 
-						if (uri.toLowerCase().startsWith("https://www.youtube.com/")) {
+						if (
+							uri.toLowerCase().startsWith(
+								"https://www.youtube.com/",
+							)
+						) {
 							const videoID = uri.substring(uri.indexOf("=") + 1);
-							thumbnail = `https://img.youtube.com/vi/${videoID}/hqdefault.jpg`;
+							thumbnail =
+								`https://img.youtube.com/vi/${videoID}/hqdefault.jpg`;
 						}
 
 						songsToAdd.push({
@@ -138,7 +148,7 @@ export default class Play extends Command {
 										ctx.message.content
 											.substring(ctx.prefix.length)
 											.trim()
-											.split(" ")[0]
+											.split(" ")[0],
 									)
 								) {
 									const tracks: Track[] = [];
@@ -147,12 +157,15 @@ export default class Play extends Command {
 										tracks.push({
 											info: {
 												author: track.info.author,
-												identifier: track.info.identifier,
-												isSeekable: track.info.isSeekable,
+												identifier:
+													track.info.identifier,
+												isSeekable:
+													track.info.isSeekable,
 												isStream: track.info.isStream,
 												length: track.info.length,
 												position: track.info.position,
-												sourceName: track.info.sourceName,
+												sourceName:
+													track.info.sourceName,
 												title: track.info.title,
 												uri: track.info.uri!,
 											},
@@ -170,12 +183,15 @@ export default class Play extends Command {
 										addTrackData({
 											info: {
 												author: track.info.author,
-												identifier: track.info.identifier,
-												isSeekable: track.info.isSeekable,
+												identifier:
+													track.info.identifier,
+												isSeekable:
+													track.info.isSeekable,
 												isStream: track.info.isStream,
 												length: track.info.length,
 												position: track.info.position,
-												sourceName: track.info.sourceName,
+												sourceName:
+													track.info.sourceName,
 												title: track.info.title,
 												uri: track.info.uri!,
 											},
@@ -231,13 +247,16 @@ export default class Play extends Command {
 										.slice(0, 5)
 										.map(
 											(track, i) =>
-												`${emojiMap[i as 0 | 1 | 2 | 3 | 4]} - [${
-													track.info.title
-												}](${track.info.uri})`
+												`${
+													emojiMap[
+														i as 0 | 1 | 2 | 3 | 4
+													]
+												} - [${track.info.title}](${track.info.uri})`,
 										)
 										.join("\n"),
 									footer: {
-										text: "This message will time out in 30 seconds!",
+										text:
+											"This message will time out in 30 seconds!",
 									},
 								}).setColor("red"),
 							],
@@ -248,7 +267,14 @@ export default class Play extends Command {
 											<Button
 												style={"blurple"}
 												emoji={{
-													name: emojiMap[i as 0 | 1 | 2 | 3 | 4],
+													name: emojiMap[
+														i as
+															| 0
+															| 1
+															| 2
+															| 3
+															| 4
+													],
 												}}
 												id={`${now}-${i.toString()}`}
 											/>
@@ -272,7 +298,7 @@ export default class Play extends Command {
 								i.user.id == ctx.author.id &&
 								i.channel!.id == ctx.channel.id &&
 								i.message.id == message.id,
-							30 * 1000
+							30 * 1000,
 						);
 
 						if (
@@ -285,7 +311,8 @@ export default class Play extends Command {
 									new Embed({
 										author: {
 											name: "Bidome bot",
-											icon_url: ctx.client.user!.avatarURL(),
+											icon_url: ctx.client.user!
+												.avatarURL(),
 										},
 										title: "Selection canceled",
 										description: "No songs were selected!",
@@ -318,11 +345,11 @@ export default class Play extends Command {
 					const queue: ServerQueue = isNewQueue
 						? queues.get(ctx.guild.id)!
 						: new ServerQueue(
-								vc.channel.id,
-								ctx.guild,
-								vc.channel,
-								await doPermCheck(ctx.member!, vc.channel)
-						  );
+							vc.channel.id,
+							ctx.guild,
+							vc.channel,
+							await doPermCheck(ctx.member!, vc.channel),
+						);
 
 					if (songsToAdd.length > 1) {
 						await message.edit(undefined, {
@@ -333,9 +360,10 @@ export default class Play extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Enqueued songs",
-									description: `Added ${songsToAdd.length} song${
-										songsToAdd.length > 1 ? "s" : ""
-									} to the queue!`,
+									description:
+										`Added ${songsToAdd.length} song${
+											songsToAdd.length > 1 ? "s" : ""
+										} to the queue!`,
 									footer: {
 										text: `Songs in queue: ${
 											queue.queue.length +
@@ -356,10 +384,13 @@ export default class Play extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Enqueued song",
-									description: `Added [${songsToAdd[0].title}](${songsToAdd[0].url}) to the queue!`,
+									description: `Added [${
+										songsToAdd[0].title
+									}](${songsToAdd[0].url}) to the queue!`,
 									footer: {
 										text: `Songs in queue: ${
-											queue.queue.length + 1 + queue.playedSongQueue.length
+											queue.queue.length + 1 +
+											queue.playedSongQueue.length
 										}`,
 									},
 								}).setColor("random"),
@@ -372,7 +403,7 @@ export default class Play extends Command {
 
 					if (queue.queueMessage == undefined) {
 						queue.queueMessage = await ctx.channel.send(
-							queue.nowPlayingMessage
+							queue.nowPlayingMessage,
 						);
 					}
 				}

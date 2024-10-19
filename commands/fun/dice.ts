@@ -77,7 +77,7 @@ export default class Dice extends Command {
 				isMessageComponentInteraction(i) &&
 				i.customID.endsWith(`-${now}`) &&
 				i.user.id === ctx.author.id,
-			30 * 1000
+			30 * 1000,
 		);
 		if (!selected[0]) {
 			await message.edit(undefined, {

@@ -57,7 +57,10 @@ export default class Remove extends Command {
 						],
 					});
 				} else {
-					const queueEntries = [...queue.queue, ...queue.playedSongQueue];
+					const queueEntries = [
+						...queue.queue,
+						...queue.playedSongQueue,
+					];
 					if (
 						ctx.argString == "" ||
 						isNaN(parseInt(ctx.argString)) ||
@@ -72,9 +75,10 @@ export default class Remove extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Invalid argument",
-									description: `Please select the song's current position (1-${
-										queueEntries.length - 1
-									})`,
+									description:
+										`Please select the song's current position (1-${
+											queueEntries.length - 1
+										})`,
 								}).setColor("red"),
 							],
 						});
@@ -84,7 +88,7 @@ export default class Remove extends Command {
 						if (position > queueEntries.length) {
 							[song] = queue.playedSongQueue.splice(
 								position - queueEntries.length,
-								1
+								1,
 							);
 						} else {
 							[song] = queue.queue.splice(position, 1);
@@ -97,7 +101,8 @@ export default class Remove extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Removed song",
-									description: `Removed [${song.title}](${song.url}) from the queue!`,
+									description:
+										`Removed [${song.title}](${song.url}) from the queue!`,
 								}).setColor("green"),
 							],
 						});

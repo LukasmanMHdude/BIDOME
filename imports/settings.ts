@@ -16,6 +16,7 @@ export type GuildConfig = {
 	suggestion_channel: string | null;
 	suggestion_accepted_channel: string | null;
 	suggestion_denied_channel: string | null;
+	djRole: string | null;
 };
 
 export const defaultGuildConfig: GuildConfig = {
@@ -24,6 +25,7 @@ export const defaultGuildConfig: GuildConfig = {
 	suggestion_channel: null,
 	suggestion_accepted_channel: null,
 	suggestion_denied_channel: null,
+	djRole: null,
 };
 
 export const serverSettings: {

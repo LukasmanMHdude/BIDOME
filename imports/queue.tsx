@@ -12,13 +12,14 @@ import {
 	Member,
 	Message,
 	VoiceChannel,
-	VoiceState,
+	type VoiceState,
 } from "./harmony.ts";
 import { Cluster, Player, PlayerEvents } from "./lavadeno.ts";
 import { formatMs, shuffleArray } from "./tools.ts";
 import { nodes } from "./nodes.ts";
 import { getEmojiByName } from "./emoji.ts";
-import { supabase } from "supabase";
+import { supabase } from "./supabase.ts";
+import { getConfig } from "./settings.ts";
 
 let client: CommandClient;
 
@@ -44,6 +45,13 @@ export const doPermCheck = async (user: Member, channel: VoiceChannel) => {
 	}
 	if (user.permissions.has("ADMINISTRATOR")) return true;
 	if (channel.guild.ownerID === user.id) return true;
+	const serverConfig = await getConfig(channel.guild);
+
+	if (serverConfig.djRole != undefined) {
+		const hasRole = await user.roles.resolve(serverConfig.djRole);
+		return hasRole != undefined;
+	}
+
 	return false;
 };
 
@@ -62,7 +70,7 @@ export class ServerQueue {
 		public channel: string,
 		private guild: Guild,
 		channelObject: VoiceChannel,
-		setAsSpeaker = false
+		setAsSpeaker = false,
 	) {
 		this.guildId = this.guild.id;
 
@@ -73,7 +81,7 @@ export class ServerQueue {
 		}
 
 		this.player ??= lavaCluster.players.create(this.guildId);
-		
+
 		this.player.voice.connect(this.channel, {
 			deafened: true,
 		});
@@ -85,7 +93,8 @@ export class ServerQueue {
 					started: new Date().toUTCString(),
 					name: this.queue[0].title,
 					author: this.queue[0].author,
-					thumbnail: this.queue[0].thumbnail ?? client.user!.avatarURL(),
+					thumbnail: this.queue[0].thumbnail ??
+						client.user!.avatarURL(),
 					requestedby: this.queue[0].requestedByString,
 					length: this.queue[0].msLength,
 				};
@@ -125,10 +134,12 @@ export class ServerQueue {
 			this.deleteQueue();
 		});
 
-		for (const errorEvent of [
-			"trackException",
-			"trackStuck",
-		] as (keyof PlayerEvents)[]) {
+		for (
+			const errorEvent of [
+				"trackException",
+				"trackStuck",
+			] as (keyof PlayerEvents)[]
+		) {
 			this.player.on(errorEvent, () => {
 				const song = this.queue.shift()!;
 
@@ -141,7 +152,8 @@ export class ServerQueue {
 									icon_url: client.user!.avatarURL(),
 								},
 								title: "Song removed",
-								description: `An error occured while playing [${song.title}
+								description:
+									`An error occured while playing [${song.title}
 									](${song.url}) so it has been removed from the queue!`,
 							}).setColor("random"),
 						],
@@ -212,16 +224,18 @@ export class ServerQueue {
 			});
 		}
 		queues.delete(this.guildId);
-		for (const key of [
-			"trackStart",
-			"trackEnd",
-			"trackException",
-			"trackStuck",
-			"disconnected",
-			"channelJoin",
-			"channelLeave",
-			"channelMove",
-		] as (keyof PlayerEvents)[]) {
+		for (
+			const key of [
+				"trackStart",
+				"trackEnd",
+				"trackException",
+				"trackStuck",
+				"disconnected",
+				"channelJoin",
+				"channelLeave",
+				"channelMove",
+			] as (keyof PlayerEvents)[]
+		) {
 			this.player.removeAllListeners(key);
 		}
 
@@ -241,7 +255,7 @@ export class ServerQueue {
 
 	private async makeBotSpeak(channelObject: VoiceChannel) {
 		const botVoiceState = await channelObject.guild.voiceStates.get(
-			client.user!.id
+			client.user!.id,
 		);
 		if (botVoiceState == undefined) return;
 		// Unimplemented methods my beloved
@@ -366,11 +380,13 @@ export class ServerQueue {
 						},
 						{
 							name: "Progress",
-							value: `${formatMs(
-								(this.player.position ?? 0) < 1000
-									? 1000
-									: this.player.position!
-							)}/${formatMs(song.msLength)}`,
+							value: `${
+								formatMs(
+									(this.player.position ?? 0) < 1000
+										? 1000
+										: this.player.position!,
+								)
+							}/${formatMs(song.msLength)}`,
 							inline: true,
 						},
 						{
@@ -412,7 +428,9 @@ export class ServerQueue {
 						<Button
 							style={"green"}
 							emoji={{
-								name: getEmojiByName("twisted_rightwards_arrows"),
+								name: getEmojiByName(
+									"twisted_rightwards_arrows",
+								),
 							}}
 							id={"shuffle-songs"}
 						/>
@@ -450,7 +468,8 @@ export const initLava = (bot: CommandClient) => {
 			userId: bot.user!.id,
 			sendGatewayCommand: (id, payload) => {
 				const shardID = Number(
-					(BigInt(id) << 22n) % BigInt(bot.shards.cachedShardCount ?? 1)
+					(BigInt(id) << 22n) %
+						BigInt(bot.shards.cachedShardCount ?? 1),
 				);
 				const shard = bot.shards.get(shardID) as Gateway;
 				// Harmony's JSR package doesn't export GatewayResponse so I need to use any - Bloxs
@@ -463,16 +482,18 @@ export const initLava = (bot: CommandClient) => {
 
 	cluster.on("nodeConnected", (node, ev) => {
 		console.log(
-			`[Lavalink] Connected to node ${node.identifier} in ${formatMs(
-				ev.took < 1000 ? 1000 : ev.took,
-				true
-			).toLowerCase()} Reconnected: ${ev.reconnected ? "Yes" : "No"}`
+			`[Lavalink] Connected to node ${node.identifier} in ${
+				formatMs(
+					ev.took < 1000 ? 1000 : ev.took,
+					true,
+				).toLowerCase()
+			} Reconnected: ${ev.reconnected ? "Yes" : "No"}`,
 		);
 	});
 
 	cluster.on("nodeDisconnected", (node, ev) => {
 		console.log(
-			`[Lavalink] Disconnected from node ${node.identifier} with code ${ev.code} and reason ${ev.reason}. Attempting to reconnect`
+			`[Lavalink] Disconnected from node ${node.identifier} with code ${ev.code} and reason ${ev.reason}. Attempting to reconnect`,
 		);
 	});
 

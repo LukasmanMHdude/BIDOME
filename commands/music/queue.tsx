@@ -68,14 +68,15 @@ export default class Queue extends Command {
 							.slice(0, 10)
 							.map(
 								({ title, url }, index) =>
-									`${emojiMap[index]} [${title}](${url})`
+									`${emojiMap[index]} [${title}](${url})`,
 							)
 							.join("\n"),
 						footer: {
 							icon_url: ctx.author.avatarURL(),
-							text: `Songs in queue: ${
-								queueEntries.length
-							} | Length: ${formatMs(queue.queueLength)}`,
+							text:
+								`Songs in queue: ${queueEntries.length} | Length: ${
+									formatMs(queue.queueLength)
+								}`,
 						},
 					}).setColor("random"),
 				],

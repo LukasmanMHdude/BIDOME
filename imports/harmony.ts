@@ -1,5 +1,4 @@
-export * from "jsr:@harmony/harmony";
-export * from "jsr:@harmony/harmony";
+export * from "jsr:@harmony/harmony@2.9.1";
 
 import {
 	ApplicationCommandInteraction,

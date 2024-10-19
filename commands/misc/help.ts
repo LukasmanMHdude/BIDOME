@@ -210,9 +210,9 @@ export default class Help extends Command {
 					.sort()
 					.map((cmd) => `${format(cmd.name)}`)
 					.join("\n - ");
-				
+
 				if (choice.toLowerCase() == "music") {
-					description += `\n - Shuffleplay`
+					description += `\n - Shuffleplay`;
 				}
 
 				description = ` - ${description}`.split("\n").sort().join("\n");

@@ -21,7 +21,9 @@ export default class SayChannel extends Command {
 				}).setColor("red")],
 			});
 		} else {
-			const channel = await ctx.client.channels.resolve(channelId) as GuildTextChannel;
+			const channel = await ctx.client.channels.resolve(
+				channelId,
+			) as GuildTextChannel;
 
 			if (channel === undefined) {
 				await ctx.message.reply(undefined, {
