@@ -6,7 +6,7 @@ A collection of various utility functions
 
 - Array
 - Env
-- FS
+- Fs
 - Numbers
 - Strings
 - Time

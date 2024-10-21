@@ -4,7 +4,7 @@
 	"exports": {
 		".": "./src/index.ts",
 
-		"./arrays": "./src/arrays.ts",
+		"./array": "./src/array.ts",
 		"./env": "./src/env.ts",
 		"./fs": "./src/fs.ts",
 		"./numbers": "./src/numbers.ts",

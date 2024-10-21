@@ -36,7 +36,7 @@ export enum NumberUnit {
 /**
  * Formats a number into a human readable format.
  */
-export const formatNumber = (num: number) => {
+export const formatNumber = (num: number): string => {
 	const prefix = {
 		[NumberUnit.QUADRILLION]: "Q",
 		[NumberUnit.TRILLION]: "T",
