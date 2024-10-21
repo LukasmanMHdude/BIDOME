@@ -1,0 +1,15 @@
+{
+	"workspace": [
+		"./src/bot",
+		"./src/utils",
+		"./src/i18n"
+	],
+	"fmt": {
+		"indentWidth": 4,
+		"lineWidth": 80,
+		"proseWrap": "always",
+		"semiColons": true,
+		"singleQuote": false,
+		"useTabs": true
+	}
+}

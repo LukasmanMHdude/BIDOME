@@ -1,0 +1,14 @@
+{
+	"name": "@studios/utils",
+	"version": "1.0.0",
+	"exports": {
+		".": "./src/index.ts",
+
+		"./arrays": "./src/arrays.ts",
+		"./env": "./src/env.ts",
+		"./fs": "./src/fs.ts",
+		"./numbers": "./src/numbers.ts",
+		"./strings": "./src/strings.ts",
+		"./time": "./src/time.ts"
+	}
+}

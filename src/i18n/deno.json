@@ -1,0 +1,14 @@
+{
+	"name": "@studios/i18n",
+	"version": "1.0.0",
+	"exports": {
+		".": "./src/index.ts",
+		"./language": "./src/language.ts",
+		"./loaders": "./src/loaders/index.ts",
+		"./loaders/yaml": "./src/loaders/yaml.ts"
+	},
+	"imports": {
+		"@std/yaml": "jsr:@std/yaml@^1.0.5",
+		"@studios/utils": "jsr:@studios/utils@1.0.0"
+	}
+}

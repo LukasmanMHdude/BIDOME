@@ -1,0 +1,21 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@std/yaml@^1.0.5": "1.0.5"
+  },
+  "jsr": {
+    "@std/yaml@1.0.5": {
+      "integrity": "71ba3d334305ee2149391931508b2c293a8490f94a337eef3a09cade1a2a2742"
+    }
+  },
+  "workspace": {
+    "members": {
+      "src/i18n": {
+        "dependencies": [
+          "jsr:@std/yaml@^1.0.5",
+          "jsr:@studios/utils@1.0.0"
+        ]
+      }
+    }
+  }
+}

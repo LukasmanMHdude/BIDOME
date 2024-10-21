@@ -1,0 +1,7 @@
+{
+	"name": "@studios/bidome",
+	"version": "3.0.0",
+	"exports": "./src/index.ts",
+	"imports": {
+	}
+}
