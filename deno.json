@@ -1,6 +1,7 @@
 {
 	"workspace": [
 		"./src/bot",
+		"./src/commandier",
 		"./src/utils",
 		"./src/i18n"
 	],
@@ -11,5 +12,9 @@
 		"semiColons": true,
 		"singleQuote": false,
 		"useTabs": true
+	},
+	"tasks": {
+		"fmt": "deno fmt",
+		"lint": "deno lint"
 	}
 }
