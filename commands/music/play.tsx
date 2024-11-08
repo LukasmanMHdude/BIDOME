@@ -8,7 +8,7 @@ import {
 	fragment,
 	isMessageComponentInteraction,
 } from "harmony";
-import { doPermCheck, lavaCluster, queues, ServerQueue, Song } from "queue";
+import { doPermCheck, nodes, queues, ServerQueue } from "queue";
 import { Track } from "lavadeno";
 import { getEmojiByName } from "emoji";
 import { shuffleArray } from "tools";
@@ -89,9 +89,10 @@ export default class Play extends Command {
 						? ctx.argString
 						: `ytsearch:${ctx.argString}`;
 
-				const { data, loadType } = await lavaCluster.api.loadTracks(
-					searchString,
-				);
+				const { loadType, tracks } = await nodes.search({
+					query: searchString,
+					requester: ctx.author.id,
+				});
 
 				if (loadType == "error" || loadType == "empty") {
 					await message.edit(undefined, {
@@ -108,37 +109,7 @@ export default class Play extends Command {
 						],
 					});
 				} else {
-					const songsToAdd: Song[] = [];
-
-					const addTrackData = (trackInfo: Track) => {
-						const {
-							info: { title, author, uri, length },
-							track,
-						} = trackInfo;
-
-						let thumbnail: undefined | string = undefined;
-
-						if (
-							uri.toLowerCase().startsWith(
-								"https://www.youtube.com/",
-							)
-						) {
-							const videoID = uri.substring(uri.indexOf("=") + 1);
-							thumbnail =
-								`https://img.youtube.com/vi/${videoID}/hqdefault.jpg`;
-						}
-
-						songsToAdd.push({
-							title,
-							author,
-							url: uri,
-							msLength: length,
-							track,
-							requestedBy: ctx.author.id,
-							thumbnail,
-							requestedByString: ctx.author.tag,
-						});
-					};
+					let songsToAdd: Track[] = [];
 
 					if (isLink) {
 						switch (loadType) {
@@ -153,70 +124,21 @@ export default class Play extends Command {
 								) {
 									const tracks: Track[] = [];
 
-									for (const track of data.tracks) {
-										tracks.push({
-											info: {
-												author: track.info.author,
-												identifier:
-													track.info.identifier,
-												isSeekable:
-													track.info.isSeekable,
-												isStream: track.info.isStream,
-												length: track.info.length,
-												position: track.info.position,
-												sourceName:
-													track.info.sourceName,
-												title: track.info.title,
-												uri: track.info.uri!,
-											},
-											track: track.encoded,
-										});
+									for (const track of tracks) {
+										songsToAdd.push(track);
 									}
 
-									const shuffledTracks = shuffleArray(tracks);
-
-									for (const track of shuffledTracks) {
-										addTrackData(track);
-									}
+									songsToAdd = shuffleArray(songsToAdd);
 								} else {
-									for (const track of data.tracks) {
-										addTrackData({
-											info: {
-												author: track.info.author,
-												identifier:
-													track.info.identifier,
-												isSeekable:
-													track.info.isSeekable,
-												isStream: track.info.isStream,
-												length: track.info.length,
-												position: track.info.position,
-												sourceName:
-													track.info.sourceName,
-												title: track.info.title,
-												uri: track.info.uri!,
-											},
-											track: track.encoded,
-										});
+									for (const track of tracks) {
+										songsToAdd.push(track);
 									}
 								}
 								break;
 							}
 
 							case "track": {
-								addTrackData({
-									info: {
-										author: data.info.author,
-										identifier: data.info.identifier,
-										isSeekable: data.info.isSeekable,
-										isStream: data.info.isStream,
-										length: data.info.length,
-										position: data.info.position,
-										sourceName: data.info.sourceName,
-										title: data.info.title,
-										uri: data.info.uri!,
-									},
-									track: data.encoded,
-								});
+								songsToAdd.push(tracks[0]);
 								break;
 							}
 						}
@@ -243,7 +165,7 @@ export default class Play extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Please select an option",
-									description: data
+									description: tracks
 										.slice(0, 5)
 										.map(
 											(track, i) =>
@@ -251,7 +173,7 @@ export default class Play extends Command {
 													emojiMap[
 														i as 0 | 1 | 2 | 3 | 4
 													]
-												} - [${track.info.title}](${track.info.uri})`,
+												} - [${track.title}](${track.url})`,
 										)
 										.join("\n"),
 									footer: {
@@ -263,7 +185,7 @@ export default class Play extends Command {
 							components: (
 								<>
 									<ActionRow>
-										{data.slice(0, 5).map((_, i) => (
+										{tracks.slice(0, 5).map((_, i) => (
 											<Button
 												style={"blurple"}
 												emoji={{
@@ -323,21 +245,8 @@ export default class Play extends Command {
 							return;
 						} else {
 							const [_, selected] = response.customID.split("-");
-							const selectedTrack = data[parseInt(selected)];
-							addTrackData({
-								info: {
-									author: selectedTrack.info.author,
-									identifier: selectedTrack.info.identifier,
-									isSeekable: selectedTrack.info.isSeekable,
-									isStream: selectedTrack.info.isStream,
-									length: selectedTrack.info.length,
-									position: selectedTrack.info.position,
-									sourceName: selectedTrack.info.sourceName,
-									title: selectedTrack.info.title,
-									uri: selectedTrack.info.uri!,
-								},
-								track: selectedTrack.encoded,
-							});
+							const selectedTrack = tracks[parseInt(selected)];
+							songsToAdd.push(selectedTrack);
 						}
 					}
 
@@ -366,9 +275,8 @@ export default class Play extends Command {
 										} to the queue!`,
 									footer: {
 										text: `Songs in queue: ${
-											queue.queue.length +
-											songsToAdd.length +
-											queue.playedSongQueue.length
+											queue.player.queue.size +
+											songsToAdd.length
 										}`,
 									},
 								}).setColor("random"),
@@ -388,10 +296,8 @@ export default class Play extends Command {
 										songsToAdd[0].title
 									}](${songsToAdd[0].url}) to the queue!`,
 									footer: {
-										text: `Songs in queue: ${
-											queue.queue.length + 1 +
-											queue.playedSongQueue.length
-										}`,
+										text:
+											`Songs in queue: ${queue.player.queue.size}`,
 									},
 								}).setColor("random"),
 							],

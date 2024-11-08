@@ -1,5 +1,5 @@
 import { Command, CommandContext, Embed } from "harmony";
-import { doPermCheck, LoopType, queues } from "queue";
+import { doPermCheck, queues } from "queue";
 
 export default class Skip extends Command {
 	name = "skip";
@@ -48,11 +48,7 @@ export default class Skip extends Command {
 			);
 
 			if (canVoteSkip) {
-				const isLooping = queue.loop;
-				queue.loop = LoopType.OFF;
-
-				await queue.player.seek(0);
-				await queue.player.stop({});
+				queue.player.skip();
 
 				await ctx.message.reply({
 					embeds: [
@@ -67,9 +63,6 @@ export default class Skip extends Command {
 						}).setColor("green"),
 					],
 				});
-
-				// Reset the loop settings
-				queue.loop = isLooping;
 			} else {
 				const voiceMembers = (
 					await botState.channel.voiceStates.array()
@@ -100,7 +93,7 @@ export default class Skip extends Command {
 											ctx.member!,
 											botState.channel,
 										) ||
-											queue.queue[0].requestedBy ==
+											queue.player.current.requestedBy ==
 												ctx.author.id)
 										? "Use forceskip to skip without a vote"
 										: "",

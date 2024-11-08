@@ -1,5 +1,5 @@
 import { Embed, MessageComponentInteraction } from "harmony";
-import { doPermCheck, LoopType, queues } from "queue";
+import { doPermCheck, queues } from "queue";
 
 export async function button(i: MessageComponentInteraction) {
 	if (i.customID == "skip-song") {
@@ -43,11 +43,7 @@ export async function button(i: MessageComponentInteraction) {
 			);
 
 			if (canVoteSkip) {
-				const isLooping = queue.loop;
-				queue.loop = LoopType.OFF;
-
-				await queue.player.seek(0);
-				await queue.player.stop({});
+				queue.player.skip();
 
 				await i.respond({
 					embeds: [
@@ -66,9 +62,6 @@ export async function button(i: MessageComponentInteraction) {
 						}).setColor("green"),
 					],
 				});
-
-				// Reset the loop settings
-				queue.loop = isLooping;
 			} else {
 				const voiceMembers = (
 					await botState.channel.voiceStates.array()
@@ -101,7 +94,7 @@ export async function button(i: MessageComponentInteraction) {
 												i.member!,
 												botState.channel,
 											)) ||
-											queue.queue[0].requestedBy ==
+											queue.player.current.requestedBy ==
 												i.member!.id
 											? " | Use forceskip to skip without a vote"
 											: ""

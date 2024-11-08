@@ -1,7 +1,6 @@
 import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 import { formatMs, toMs } from "tools";
-import { supabase } from "supabase";
 
 export default class Seek extends Command {
 	name = "seek";
@@ -54,7 +53,7 @@ export default class Seek extends Command {
 					});
 				} else {
 					queue.player.seek(position);
-					queue.player.position = position;
+					queue.player.current.position = position;
 
 					if (queue.queueMessage != undefined) {
 						queue.queueMessage.edit(queue.nowPlayingMessage);
@@ -77,26 +76,6 @@ export default class Seek extends Command {
 							}).setColor("green"),
 						],
 					});
-					const song = queue.queue[0];
-
-					const newPlayedAtDate = new Date(
-						Date.now() -
-							(song.msLength - (song.msLength - position)),
-					).toUTCString();
-
-					const dbData = {
-						server_id: ctx.guild.id,
-						started: newPlayedAtDate,
-						name: song.title,
-						author: song.author,
-						thumbnail: song.thumbnail,
-						requestedby: song.requestedByString,
-						length: song.msLength,
-					};
-
-					await supabase.from("music_notifications").update(dbData)
-						.eq("server_id", ctx.guild.id)
-						.select("*");
 				}
 			} else {
 				await ctx.message.reply({

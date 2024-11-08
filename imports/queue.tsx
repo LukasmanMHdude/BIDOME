@@ -14,25 +14,82 @@ import {
 	VoiceChannel,
 	type VoiceState,
 } from "./harmony.ts";
-import { Cluster, Player, PlayerEvents } from "./lavadeno.ts";
-import { formatMs, shuffleArray } from "./tools.ts";
-import { nodes } from "./nodes.ts";
+import { Manager, Player, type Track, type TTrackEndType } from "./lavadeno.ts";
+import { formatMs } from "./tools.ts";
 import { getEmojiByName } from "./emoji.ts";
-import { supabase } from "./supabase.ts";
 import { getConfig } from "./settings.ts";
 
-let client: CommandClient;
+export let client: CommandClient;
 
 export const queues: Map<string, ServerQueue> = new Map();
 
-export let lavaCluster: Cluster;
+const nodesCount = parseInt(Deno.env.get("LAVALINK_NODES")!);
 
-export enum LoopType {
-	SONG = "song",
-	QUEUE = "queue",
-	SHUFFLE = "shuffle",
-	OFF = "off",
+if (isNaN(nodesCount)) {
+	throw new Error("Invalid node count");
 }
+
+export const nodes = new Manager({
+	nodes: new Array(nodesCount).fill(undefined).map((_, i) => ({
+		host: Deno.env.get(`LAVALINK_${i + 1}_HOST`)!,
+		port: parseInt(Deno.env.get(`LAVALINK_${i + 1}_PORT`)!),
+		password: Deno.env.get(`LAVALINK_${i + 1}_PASSWORD`)!,
+		secure: Deno.env.get(`LAVALINK_${i + 1}_SECURE`) == "true",
+		identifier: Deno.env.get(`LAVALINK_${i + 1}_NAME`)!,
+		retryDelay: 5 * 1000,
+	})),
+	options: {
+		clientName: "Bidome",
+	},
+	sendPayload: async (guildID: string, payload: unknown) => {
+		const guild = await client.guilds.resolve(guildID);
+		if (guild == undefined) return;
+		const shard = client.shards.get(guild.shardID) as Gateway;
+		// deno-lint-ignore no-explicit-any
+		shard.send(JSON.parse(payload as any));
+	},
+});
+
+export const playerEventHandlers = new Map<
+	string,
+	{
+		trackStart: (track: Track) => Promise<void> | void;
+		playerMoved: (
+			oldChannel: string,
+			newChannel: string,
+		) => Promise<void> | void;
+		playerDisconnected: () => Promise<void> | void;
+		trackEnd: (track: Track, reason: TTrackEndType) => Promise<void> | void;
+	}
+>();
+
+nodes.on("trackStart", async (player, track) => {
+	const handlers = playerEventHandlers.get(player.guildId);
+	if (handlers != undefined) {
+		await handlers.trackStart(track);
+	}
+});
+
+nodes.on("playerMoved", async (player, oldChannel, newChannel) => {
+	const handlers = playerEventHandlers.get(player.guildId);
+	if (handlers != undefined) {
+		await handlers.playerMoved(oldChannel, newChannel);
+	}
+});
+
+nodes.on("playerDisconnected", (player) => {
+	const handlers = playerEventHandlers.get(player.guildId);
+	if (handlers != undefined) {
+		handlers.playerDisconnected();
+	}
+});
+
+nodes.on("trackEnd", (player, track, reason) => {
+	const handlers = playerEventHandlers.get(player.guildId);
+	if (handlers != undefined) {
+		handlers.trackEnd(track, reason);
+	}
+});
 
 export const doPermCheck = async (user: Member, channel: VoiceChannel) => {
 	// We do a bit of trolling
@@ -59,10 +116,7 @@ export class ServerQueue {
 	public readonly player: Player;
 	public readonly guildId: string;
 	public voteSkipUsers: string[] = [];
-	public queue: Song[] = [];
-	public playedSongQueue: Song[] = [];
 	public volume = 100;
-	public loop = LoopType.OFF;
 	private firstSong = true;
 	public queueMessage?: Message;
 
@@ -75,131 +129,53 @@ export class ServerQueue {
 		this.guildId = this.guild.id;
 
 		try {
-			this.player = lavaCluster.players.resolve(this.guildId)!;
+			this.player = nodes.players.get(this.guildId)!;
 		} catch {
 			// Ignore error
 		}
 
-		this.player ??= lavaCluster.players.create(this.guildId);
-
-		this.player.voice.connect(this.channel, {
-			deafened: true,
+		this.player ??= nodes.players.create({
+			guildId: this.guildId,
+			voiceChannelId: channelObject.id,
+			textChannelId: channel,
+			autoPlay: true,
+			autoLeave: true,
 		});
 
-		this.player.on("trackStart", async () => {
-			if (this.queue[0] != undefined) {
-				const dbData = {
-					server_id: this.guildId,
-					started: new Date().toUTCString(),
-					name: this.queue[0].title,
-					author: this.queue[0].author,
-					thumbnail: this.queue[0].thumbnail ??
-						client.user!.avatarURL(),
-					requestedby: this.queue[0].requestedByString,
-					length: this.queue[0].msLength,
-				};
-
-				if (Deno.env.get("DISABLE_UNDOCUMENTED_FEATURES") != "true") {
-					await supabase
-						.from("music_notifications")
-						.upsert(dbData, {
-							onConflict: "server_id",
-							ignoreDuplicates: false,
-						})
-						.select("*");
-				}
-			}
-
-			if (setAsSpeaker && this.firstSong) {
-				if (channelObject.type == ChannelTypes.GUILD_STAGE_VOICE) {
-					this.makeBotSpeak(channelObject);
-				}
-			}
-			this.voteSkipUsers = [];
-
-			if (this.queueMessage != undefined) {
-				if (this.firstSong) {
-					this.firstSong = false;
-				} else {
-					await this.queueMessage.edit(this.nowPlayingMessage);
-				}
-			}
+		this.player.connect({
+			setDeaf: true,
 		});
 
-		this.player.voice.on("channelMove", (_, to) => {
-			this.channel = to.toString();
-		});
-
-		this.player.voice.on("channelLeave", () => {
-			this.deleteQueue();
-		});
-
-		for (
-			const errorEvent of [
-				"trackException",
-				"trackStuck",
-			] as (keyof PlayerEvents)[]
-		) {
-			this.player.on(errorEvent, () => {
-				const song = this.queue.shift()!;
-
-				if (this.queueMessage != undefined) {
-					this.queueMessage.reply(undefined, {
-						embeds: [
-							new Embed({
-								author: {
-									name: "Bidome bot",
-									icon_url: client.user!.avatarURL(),
-								},
-								title: "Song removed",
-								description:
-									`An error occured while playing [${song.title}
-									](${song.url}) so it has been removed from the queue!`,
-							}).setColor("random"),
-						],
-					});
-				}
-
-				if (this.queue.length > 0) {
-					this.play();
-				} else {
+		playerEventHandlers.set(this.guildId, {
+			playerDisconnected: () => {
+				this.deleteQueue();
+			},
+			playerMoved: (_, newChannel) => {
+				this.channel = newChannel;
+			},
+			trackEnd: () => {
+				console.log("Track ended");
+				if (this.player.queue.size == 0) {
 					this.deleteQueue();
 				}
-			});
-		}
-
-		this.player.on("trackEnd", () => {
-			this.player.stop({});
-
-			switch (this.loop) {
-				case LoopType.SONG: {
-					break;
-				}
-				case LoopType.QUEUE: {
-					this.queue.push(this.queue.shift()!);
-					break;
-				}
-				case LoopType.SHUFFLE: {
-					this.playedSongQueue.push(this.queue.shift()!);
-					this.playedSongQueue = shuffleArray(this.playedSongQueue);
-
-					if (this.queue.length == 0) {
-						this.queue = this.playedSongQueue;
-						this.playedSongQueue = [];
+			},
+			trackStart: async () => {
+				if (setAsSpeaker && this.firstSong) {
+					if (channelObject.type == ChannelTypes.GUILD_STAGE_VOICE) {
+						this.makeBotSpeak(channelObject);
 					}
-					break;
 				}
-				default: {
-					this.queue.shift();
-					break;
-				}
-			}
 
-			if (this.queue.length > 0) {
-				this.play();
-			} else {
-				this.deleteQueue();
-			}
+				this.voteSkipUsers = [];
+
+				if (this.queueMessage != undefined) {
+					if (this.firstSong) {
+						this.firstSong = false;
+					} else {
+						await this.queueMessage.edit(this.nowPlayingMessage);
+					}
+				}
+			},
 		});
 
 		queues.set(this.guildId, this);
@@ -224,33 +200,13 @@ export class ServerQueue {
 			});
 		}
 		queues.delete(this.guildId);
-		for (
-			const key of [
-				"trackStart",
-				"trackEnd",
-				"trackException",
-				"trackStuck",
-				"disconnected",
-				"channelJoin",
-				"channelLeave",
-				"channelMove",
-			] as (keyof PlayerEvents)[]
-		) {
-			this.player.removeAllListeners(key);
-		}
+		playerEventHandlers.delete(this.guildId);
 
 		if (this.player.playing) {
 			await this.player.stop({});
 		}
 
-		this.player.voice.disconnect();
-
-		if (Deno.env.get("DISABLE_UNDOCUMENTED_FEATURES") != "true") {
-			await supabase
-				.from("music_notifications")
-				.delete()
-				.eq("server_id", this.guildId);
-		}
+		this.player.disconnect();
 	}
 
 	private async makeBotSpeak(channelObject: VoiceChannel) {
@@ -264,15 +220,16 @@ export class ServerQueue {
 		].patch({ channel_id: this.channel, suppress: false });
 	}
 
-	public addSongs(song: Song | Song[]) {
-		const shouldPlay = this.queue.length < 1;
-		if (Array.isArray(song)) {
-			this.queue.push(...song);
+	public addSongs(songs: Track | Track[]) {
+		if (Array.isArray(songs)) {
+			for (const song of songs) {
+				this.player.queue.add(song);
+			}
 		} else {
-			this.queue.push(song);
+			this.player.queue.add(songs);
 		}
 
-		if (shouldPlay) {
+		if (!this.player.playing) {
 			this.play();
 		}
 	}
@@ -292,45 +249,27 @@ export class ServerQueue {
 		);
 	}
 
-	private async play() {
-		if (this.queue.length < 1) return this.deleteQueue();
+	private play() {
+		if (this.player.queue.size < 1) return this.deleteQueue();
 		this.voteSkipUsers = [];
 
-		const track = this.queue[0];
-
-		await this.player.play(track.track, {
-			volume: this.volume,
-		});
-
-		if (!this.player.voice.connected) {
-			this.player.voice.connect(this.channel, {
-				deafened: true,
-			});
-			this.player.voice.connected = true;
+		if (!this.player.playing) {
+			this.player.play();
 		}
 	}
 
 	public get queueLength() {
 		let queueLength = 0;
 
-		for (const { msLength } of [...this.queue, ...this.playedSongQueue]) {
-			queueLength += msLength;
+		for (const { duration } of this.player.queue.tracks) {
+			queueLength += duration;
 		}
 
 		return queueLength;
 	}
 
-	public get loopType() {
-		return {
-			[LoopType.SONG]: "Song Loop",
-			[LoopType.QUEUE]: "Queue Loop",
-			[LoopType.SHUFFLE]: "Shuffle Loop",
-			[LoopType.OFF]: "Disabled",
-		}[this.loop];
-	}
-
 	public get nowPlayingMessage(): AllMessageOptions {
-		const song = this.queue[0];
+		const song = this.player.current;
 
 		if (song == undefined) {
 			return {
@@ -355,7 +294,7 @@ export class ServerQueue {
 						name: "Bidome bot",
 						icon_url: client.user!.avatarURL(),
 					},
-					title: "Now Playing",
+					title: `Now Playing ${this.player.playing ? "y" : "n"}`,
 					fields: [
 						{
 							name: "Song",
@@ -369,7 +308,7 @@ export class ServerQueue {
 						},
 						{
 							name: "Length",
-							value: formatMs(song.msLength),
+							value: formatMs(song.duration),
 							inline: true,
 						},
 
@@ -382,26 +321,31 @@ export class ServerQueue {
 							name: "Progress",
 							value: `${
 								formatMs(
-									(this.player.position ?? 0) < 1000
+									(this.player.current.position ?? 0) < 1000
 										? 1000
-										: this.player.position!,
+										: this.player.current.position!,
 								)
-							}/${formatMs(song.msLength)}`,
+							}/${formatMs(song.duration)}`,
 							inline: true,
 						},
 						{
 							name: "Loop Status",
-							value: this.loopType,
+							value: {
+								"off": "Off",
+								"track": "Song",
+								"queue": "Queue",
+							}[this.player.loop],
 							inline: true,
 						},
 					],
 					thumbnail: {
-						url: song.thumbnail,
+						url: song.artworkUrl,
 					},
 					footer: {
-						text: `Songs in queue: ${
-							this.queue.length + this.playedSongQueue.length
-						} | Length: ${formatMs(this.queueLength)}`,
+						text:
+							`Songs in queue: ${this.player.queue.size} | Length: ${
+								formatMs(this.queueLength)
+							}`,
 					},
 				}).setColor("random"),
 			],
@@ -448,69 +392,32 @@ export class ServerQueue {
 	}
 }
 
-export interface Song {
-	title: string;
-	author: string;
-	url: string;
-	msLength: number;
-	track: string;
-	requestedBy: string;
-	requestedByString: string;
-	thumbnail?: string;
-}
-
 export const initLava = (bot: CommandClient) => {
 	client = bot;
 
-	const cluster = new Cluster({
-		nodes,
-		discord: {
-			userId: bot.user!.id,
-			sendGatewayCommand: (id, payload) => {
-				const shardID = Number(
-					(BigInt(id) << 22n) %
-						BigInt(bot.shards.cachedShardCount ?? 1),
-				);
-				const shard = bot.shards.get(shardID) as Gateway;
-				// Harmony's JSR package doesn't export GatewayResponse so I need to use any - Bloxs
-				// deno-lint-ignore no-explicit-any
-				shard.send(payload as any);
-			},
-		},
+	nodes.on("nodeCreate", (node) => {
+		console.log(`[Lavalink] Created node ${node.identifier}`);
 	});
-	lavaCluster = cluster;
 
-	cluster.on("nodeConnected", (node, ev) => {
+	nodes.on("nodeConnected", (node) => {
+		console.log(`[Lavalink] Connected to node ${node.identifier}`);
+	});
+
+	nodes.on("nodeDisconnect", (node, code, reason) => {
 		console.log(
-			`[Lavalink] Connected to node ${node.identifier} in ${
-				formatMs(
-					ev.took < 1000 ? 1000 : ev.took,
-					true,
-				).toLowerCase()
-			} Reconnected: ${ev.reconnected ? "Yes" : "No"}`,
+			`[Lavalink] Disconnected from node ${node.identifier} with code ${code} and reason ${reason}. Attempting to reconnect`,
 		);
 	});
 
-	cluster.on("nodeDisconnected", (node, ev) => {
-		console.log(
-			`[Lavalink] Disconnected from node ${node.identifier} with code ${ev.code} and reason ${ev.reason}. Attempting to reconnect`,
-		);
-	});
-
-	cluster.on("nodeError", (node, error) => {
+	nodes.on("nodeError", (node, error) => {
 		console.log(`[Lavalink] Error on node ${node.identifier}:`, error);
 	});
 
-	bot.on("raw", (event, payload) => {
-		switch (event) {
-			case "VOICE_STATE_UPDATE":
-			case "VOICE_SERVER_UPDATE": {
-				cluster.players.handleVoiceUpdate(payload);
-			}
-		}
+	bot.on("raw", (_, payload) => {
+		nodes.packetUpdate(payload);
 	});
 
-	cluster.connect({
-		userId: bot.user!.id,
-	});
+	console.log("[Lavalink] Initializing nodes");
+
+	nodes.init(bot.user!.id);
 };

@@ -1,6 +1,5 @@
 import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
-import { shuffleArray } from "tools";
 
 export default class Shuffle extends Command {
 	name = "shuffle";
@@ -36,10 +35,7 @@ export default class Shuffle extends Command {
 		} else {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (await doPermCheck(ctx.member!, botState.channel)) {
-				const nowPlaying = queue.queue[0];
-				const toMixSongs = queue.queue.slice(1);
-
-				queue.queue = [nowPlaying, ...shuffleArray(toMixSongs)];
+				queue.player.queue.shuffle();
 
 				await ctx.message.reply({
 					embeds: [

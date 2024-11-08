@@ -1,5 +1,5 @@
 import { Command, CommandContext, Embed } from "harmony";
-import { doPermCheck, LoopType, queues } from "queue";
+import { doPermCheck, queues } from "queue";
 
 export default class QueueLoop extends Command {
 	name = "queueloop";
@@ -42,14 +42,13 @@ export default class QueueLoop extends Command {
 		} else {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (await doPermCheck(ctx.member!, botState.channel)) {
-				const loopType = queue.loopType;
-				const loopTypeEnum = queue.loop;
-				const isLoopDisabled = queue.loop != LoopType.QUEUE;
+				const previousLoopType = queue.player.loop.toString();
+				const isLoopDisabled = queue.player.loop != "queue";
 
 				if (isLoopDisabled) {
-					queue.loop = LoopType.QUEUE;
+					queue.player.setLoop("queue");
 				} else {
-					queue.loop = LoopType.OFF;
+					queue.player.setLoop("off");
 				}
 
 				await ctx.message.reply({
@@ -59,15 +58,15 @@ export default class QueueLoop extends Command {
 								name: "Bidome bot",
 								icon_url: ctx.client.user!.avatarURL(),
 							},
-							title: "Toggled loop",
+							title: "Toggled song loop",
 							description: `Queue looping is now ${
-								loopTypeEnum == LoopType.QUEUE
+								previousLoopType == "queue"
 									? "Disabled"
 									: "Enabled"
 							} ${
-								loopTypeEnum != LoopType.OFF &&
-									loopTypeEnum != LoopType.QUEUE
-									? `and ${loopType}ing is now disabled`
+								previousLoopType != "off" &&
+									previousLoopType != "queue"
+									? `and track looping is now disabled`
 									: ""
 							}`,
 						}).setColor("green"),

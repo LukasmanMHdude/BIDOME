@@ -68,7 +68,7 @@ export async function button(i: MessageComponentInteraction) {
 								icon_url: i.client.user!.avatarURL(),
 							},
 							title: "Server queue",
-							description: queue.queue
+							description: queue.player.queue.tracks
 								.slice(startingValue, startingValue + 10)
 								.map(
 									({ title, url }, index) =>
@@ -84,7 +84,7 @@ export async function button(i: MessageComponentInteraction) {
 							footer: {
 								icon_url: i.user.avatarURL(),
 								text:
-									`Songs in queue: ${queue.queue.length} | Length: ${
+									`Songs in queue: ${queue.player.queue.size} | Length: ${
 										formatMs(queue.queueLength)
 									}`,
 							},
@@ -106,7 +106,7 @@ export async function button(i: MessageComponentInteraction) {
 								<Button
 									style={"blurple"}
 									id={`queuepg-${pageOffset + 1}`}
-									disabled={queue.queue.length <=
+									disabled={queue.player.queue.size <=
 										startingValue + 10}
 									emoji={{
 										name: getEmojiByName("arrow_right"),

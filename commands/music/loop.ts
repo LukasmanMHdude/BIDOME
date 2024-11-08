@@ -1,5 +1,5 @@
 import { Command, CommandContext, Embed } from "harmony";
-import { doPermCheck, LoopType, queues } from "queue";
+import { doPermCheck, queues } from "queue";
 
 export default class Loop extends Command {
 	name = "loop";
@@ -42,14 +42,13 @@ export default class Loop extends Command {
 		} else {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (await doPermCheck(ctx.member!, botState.channel)) {
-				const loopType = queue.loopType;
-				const loopTypeEnum = queue.loop;
-				const isLoopDisabled = queue.loop != LoopType.SONG;
+				const previousLoopType = queue.player.loop.toString();
+				const isLoopDisabled = queue.player.loop != "track";
 
 				if (isLoopDisabled) {
-					queue.loop = LoopType.SONG;
+					queue.player.setLoop("track");
 				} else {
-					queue.loop = LoopType.OFF;
+					queue.player.setLoop("off");
 				}
 
 				await ctx.message.reply({
@@ -61,13 +60,13 @@ export default class Loop extends Command {
 							},
 							title: "Toggled song loop",
 							description: `Song looping is now ${
-								loopTypeEnum == LoopType.SONG
+								previousLoopType == "track"
 									? "Disabled"
 									: "Enabled"
 							} ${
-								loopTypeEnum != LoopType.OFF &&
-									loopTypeEnum != LoopType.SONG
-									? `and ${loopType}ing is now disabled`
+								previousLoopType != "off" &&
+									previousLoopType != "track"
+									? `and queue looping is now disabled`
 									: ""
 							}`,
 						}).setColor("green"),

@@ -1,5 +1,5 @@
 import { Command, CommandContext, Embed } from "harmony";
-import { doPermCheck, queues, Song } from "queue";
+import { doPermCheck, queues } from "queue";
 
 export default class Remove extends Command {
 	name = "remove";
@@ -42,7 +42,7 @@ export default class Remove extends Command {
 		} else {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (await doPermCheck(ctx.member!, botState.channel)) {
-				if (queue.queue.length < 2) {
+				if (queue.player.queue.size < 2) {
 					await ctx.message.reply({
 						embeds: [
 							new Embed({
@@ -57,15 +57,11 @@ export default class Remove extends Command {
 						],
 					});
 				} else {
-					const queueEntries = [
-						...queue.queue,
-						...queue.playedSongQueue,
-					];
 					if (
 						ctx.argString == "" ||
 						isNaN(parseInt(ctx.argString)) ||
 						parseInt(ctx.argString) < 1 ||
-						parseInt(ctx.argString) > queueEntries.length
+						parseInt(ctx.argString) > queue.player.queue.size
 					) {
 						await ctx.message.reply({
 							embeds: [
@@ -77,22 +73,16 @@ export default class Remove extends Command {
 									title: "Invalid argument",
 									description:
 										`Please select the song's current position (1-${
-											queueEntries.length - 1
+											queue.player.queue.size - 1
 										})`,
 								}).setColor("red"),
 							],
 						});
 					} else {
 						const position = parseInt(ctx.argString);
-						let [song]: Song[] = queueEntries.splice(position, 1);
-						if (position > queueEntries.length) {
-							[song] = queue.playedSongQueue.splice(
-								position - queueEntries.length,
-								1,
-							);
-						} else {
-							[song] = queue.queue.splice(position, 1);
-						}
+						const track = queue.player.queue.get(position);
+						const _remove = queue.player.queue.remove(position);
+
 						await ctx.message.reply({
 							embeds: [
 								new Embed({
@@ -102,7 +92,7 @@ export default class Remove extends Command {
 									},
 									title: "Removed song",
 									description:
-										`Removed [${song.title}](${song.url}) from the queue!`,
+										`Removed [${track.title}](${track.url}) from the queue!`,
 								}).setColor("green"),
 							],
 						});

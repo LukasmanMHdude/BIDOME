@@ -43,13 +43,9 @@ export default class ForceSkip extends Command {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (
 				(await doPermCheck(ctx.member!, botState.channel!)) ||
-				queue.queue[0].requestedBy == ctx.author.id
+				queue.player.current.requestedBy == ctx.author.id
 			) {
-				const isLooping = queue.loop;
-				queue.loop = LoopType.OFF;
-
-				await queue.player.seek(0);
-				await queue.player.stop({});
+				queue.player.skip();
 
 				await ctx.message.reply({
 					embeds: [
@@ -63,8 +59,6 @@ export default class ForceSkip extends Command {
 						}).setColor("green"),
 					],
 				});
-
-				queue.loop = isLooping;
 			} else {
 				await ctx.message.reply({
 					embeds: [

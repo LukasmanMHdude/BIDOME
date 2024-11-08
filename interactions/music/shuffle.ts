@@ -1,5 +1,4 @@
 import { Embed, MessageComponentInteraction } from "harmony";
-import { shuffleArray } from "tools";
 import { doPermCheck, queues } from "queue";
 
 export async function button(i: MessageComponentInteraction) {
@@ -29,10 +28,7 @@ export async function button(i: MessageComponentInteraction) {
 		} else {
 			const queue = queues.get(i.guild!.id)!;
 			if (await doPermCheck(i.member!, botState.channel)) {
-				const nowPlaying = queue.queue[0];
-				const toMixSongs = queue.queue.slice(1);
-
-				queue.queue = [nowPlaying, ...shuffleArray(toMixSongs)];
+				queue.player.shuffle();
 
 				await i.respond({
 					ephemeral: true,
