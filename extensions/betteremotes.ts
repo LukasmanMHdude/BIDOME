@@ -73,7 +73,7 @@ export const slashCommands: ApplicationCommand[] = [
 			const message = i.targetMessage;
 			const authorIsBot = message?.webhookID != undefined;
 
-			if (!authorIsBot) {
+			if (!authorIsBot || message.attachments.length < 1) {
 				await i.respond({
 					embeds: [
 						new Embed({
@@ -89,13 +89,16 @@ export const slashCommands: ApplicationCommand[] = [
 					ephemeral: true,
 				});
 			} else {
+				const isBidomeMessage = message.attachments.filter((a) =>
+					/^b-data-[0-9]{1,}.png$/.test(a.filename)
+				);
+
 				if (
-					message.attachments.filter(
-						(a) =>
-							a.filename.toLowerCase() ==
-								`b-data-${i.user.id}.png`,
+					isBidomeMessage &&
+					(message.attachments.filter(
+						(a) => a.filename.toLowerCase() == `b-data-${i.user.id}.png`
 					) ||
-					i.member?.permissions.has("MANAGE_MESSAGES")
+						i.member?.permissions.has("MANAGE_MESSAGES"))
 				) {
 					await message.delete();
 					await i.respond({
@@ -152,19 +155,20 @@ export const slashCommands: ApplicationCommand[] = [
 			const message = i.targetMessage;
 			const authorIsBot = message?.webhookID != undefined;
 
+			const isBidomeMessage = message?.attachments.filter((a) =>
+				/^b-data-[0-9]{1,}.png$/.test(a.filename)
+			);
+
 			if (
+				(message?.attachments.length ?? 0) < 1 ||
 				!authorIsBot ||
-				!message.attachments.filter(
-					(a) =>
-						a.filename.toLowerCase() == `b-data-${i.user.id}.png`,
-				)
+				!isBidomeMessage
 			) {
 				await i.respond({
 					embeds: [
 						new Embed({
 							title: "Unable to get author",
-							description:
-								"This is not an emotified message sent by me.",
+							description: "This is not an emotified message sent by me.",
 							author: {
 								name: "Bidome bot",
 								icon_url: i.client.user!.avatarURL(),
@@ -184,9 +188,7 @@ export const slashCommands: ApplicationCommand[] = [
 
 				try {
 					member = await i.guild!.members.resolve(userId);
-					if (
-						member == undefined || member.user.username == undefined
-					) {
+					if (member == undefined || member.user.username == undefined) {
 						member = await i.guild!.members.fetch(userId);
 					}
 				} catch {
@@ -208,8 +210,7 @@ export const slashCommands: ApplicationCommand[] = [
 						embeds: [
 							new Embed({
 								title: `Unable to fetch user`,
-								description:
-									`I'm unable to find any information regarding <@!${userId}>, who originally sent this message.`,
+								description: `I'm unable to find any information regarding <@!${userId}>, who originally sent this message.`,
 								author: {
 									name: "Bidome bot",
 									icon_url: i.client.user!.avatarURL(),
@@ -222,13 +223,12 @@ export const slashCommands: ApplicationCommand[] = [
 				}
 
 				// One of these won't be undefined - Bloxs
-				const userAvatarURL = user!.avatarURL() ??
-					member!.user.avatarURL();
+				const userAvatarURL = user!.avatarURL() ?? member!.user.avatarURL();
 				let embedColor = "random";
 
 				if (userAvatarURL != undefined) {
 					const avatar = await Image.decode(
-						await getDiscordImage(userAvatarURL),
+						await getDiscordImage(userAvatarURL)
 					);
 
 					const avgColor = avatar.averageColor();
@@ -240,15 +240,10 @@ export const slashCommands: ApplicationCommand[] = [
 					ephemeral: true,
 					embeds: [
 						new Embed({
-							title: `Message by ${
-								user?.tag ?? member?.user.tag
-							} ${
-								member?.nick != undefined
-									? `(${member?.nick})`
-									: ""
+							title: `Message by ${user?.tag ?? member?.user.tag} ${
+								member?.nick != undefined ? `(${member?.nick})` : ""
 							}`,
-							description:
-								`This message was sent by <@!${userId}>`,
+							description: `This message was sent by <@!${userId}>`,
 							thumbnail: {
 								url: userAvatarURL,
 							},
@@ -286,14 +281,16 @@ export const slashCommands: ApplicationCommand[] = [
 			}
 			const message = i.targetMessage;
 			const authorIsBot = message?.webhookID != undefined;
+			const isBidomeMessage = message?.attachments.filter((a) =>
+				/^b-data-[0-9]{1,}.png$/.test(a.filename)
+			);
 
-			if (!authorIsBot) {
+			if (!authorIsBot || !isBidomeMessage || message.attachments.length < 1) {
 				await i.respond({
 					embeds: [
 						new Embed({
 							title: "Unable to edit",
-							description:
-								"I can't edit messages not sent by myself.",
+							description: "I can't edit messages not sent by myself.",
 							author: {
 								name: "Bidome bot",
 								icon_url: i.client.user!.avatarURL(),
@@ -305,9 +302,7 @@ export const slashCommands: ApplicationCommand[] = [
 			} else {
 				if (
 					message.attachments.filter(
-						(a) =>
-							a.filename.toLowerCase() ==
-								`b-data-${i.user.id}.png`,
+						(a) => a.filename.toLowerCase() == `b-data-${i.user.id}.png`
 					)
 				) {
 					await i.showModal({
@@ -322,9 +317,7 @@ export const slashCommands: ApplicationCommand[] = [
 										customID: message.id,
 										style: 1,
 										label: "Message",
-										value: replaceAllEmotesWithText(
-											message.content,
-										),
+										value: replaceAllEmotesWithText(message.content),
 										minLength: 1,
 										maxLength: 1500,
 										required: true,
@@ -363,13 +356,13 @@ export default class BetterEmotes extends Extension {
 
 	public static emotifyMessage(
 		message: string,
-		validEmojisArray: ServerEmoteList[],
+		validEmojisArray: ServerEmoteList[]
 	) {
 		for (const emote of validEmojisArray ?? []) {
 			if (!emote.available) continue;
 			message = message.replace(
 				new RegExp(`(?!<a?):${emote.name}:(?![0-9]+>)`, "g"),
-				`<${emote.animated ? "a" : ""}:${emote.name}:${emote.id}>`,
+				`<${emote.animated ? "a" : ""}:${emote.name}:${emote.id}>`
 			);
 		}
 
@@ -384,7 +377,7 @@ export default class BetterEmotes extends Extension {
 				id: id!,
 				animated: animated!,
 				available: available!,
-			}),
+			})
 		);
 		this.serverEmoteCache.set(guild.id, emotes);
 		await this.saveCache();
@@ -411,7 +404,7 @@ export default class BetterEmotes extends Extension {
 
 		if (memberServerCache != undefined) {
 			this.memberServerCache = new Map(
-				Object.entries(JSON.parse(memberServerCache)),
+				Object.entries(JSON.parse(memberServerCache))
 			);
 		} else {
 			await Deno.writeTextFile("./.cache/memberServerCache.json", "{}");
@@ -419,7 +412,7 @@ export default class BetterEmotes extends Extension {
 
 		if (serverEmoteCache != undefined) {
 			this.serverEmoteCache = new Map(
-				Object.entries(JSON.parse(serverEmoteCache)),
+				Object.entries(JSON.parse(serverEmoteCache))
 			);
 		} else {
 			await Deno.writeTextFile("./.cache/serverEmoteCache.json", "{}");
@@ -432,11 +425,11 @@ export default class BetterEmotes extends Extension {
 		await Promise.all([
 			Deno.writeTextFile(
 				"./.cache/memberServerCache.json",
-				JSON.stringify(Object.fromEntries(this.memberServerCache)),
+				JSON.stringify(Object.fromEntries(this.memberServerCache))
 			),
 			Deno.writeTextFile(
 				"./.cache/serverEmoteCache.json",
-				JSON.stringify(Object.fromEntries(this.serverEmoteCache)),
+				JSON.stringify(Object.fromEntries(this.serverEmoteCache))
 			),
 		]);
 	}
@@ -519,13 +512,11 @@ export default class BetterEmotes extends Extension {
 		if (emojis == null) return;
 
 		let webhook = webhooks.find(
-			(w) =>
-				w.name?.toLowerCase() == "bidome bot" && w.token != undefined,
+			(w) => w.name?.toLowerCase() == "bidome bot" && w.token != undefined
 		);
 
 		if (!this.memberServerCache.has(msg.author.id)) {
-			const guildsToSearch = this.serverIds ??
-				(await msg.client.guilds.keys());
+			const guildsToSearch = this.serverIds ?? (await msg.client.guilds.keys());
 
 			for await (const guildId of guildsToSearch) {
 				const guild = await msg.client.guilds.resolve(guildId);
@@ -547,7 +538,7 @@ export default class BetterEmotes extends Extension {
 		for (const guild of mutualGuilds) {
 			for (const emoji of this.serverEmoteCache.get(guild) ?? []) {
 				const sameNamedEmotes = validEmojisArray.filter(
-					(e) => e.name == emoji.name,
+					(e) => e.name == emoji.name
 				);
 				if (sameNamedEmotes.length > 0) {
 					validEmojisArray.push({
@@ -560,10 +551,7 @@ export default class BetterEmotes extends Extension {
 			}
 		}
 
-		const message = BetterEmotes.emotifyMessage(
-			msg.content,
-			validEmojisArray,
-		);
+		const message = BetterEmotes.emotifyMessage(msg.content, validEmojisArray);
 
 		if (message == msg.content) return;
 
@@ -582,7 +570,7 @@ export default class BetterEmotes extends Extension {
 
 		if (msg.messageReference != undefined) {
 			const refMsg = await msg.channel.messages.fetch(
-				msg.messageReference.message_id!,
+				msg.messageReference.message_id!
 			);
 			if (refMsg != undefined) {
 				messageEmbeds.push(
@@ -591,26 +579,21 @@ export default class BetterEmotes extends Extension {
 							name: `Replying to: ${refMsg.author.tag}`,
 							icon_url: refMsg.author.avatarURL(),
 						},
-						description: `${
-							truncateString(
-								refMsg.content,
-								100,
-							)
-						} \n\n[Click to jump to message](${`https://discord.com/channels/${
+						description: `${truncateString(
+							refMsg.content,
+							100
+						)} \n\n[Click to jump to message](${`https://discord.com/channels/${
 							msg.guild!.id
 						}/${msg.channel.id}/${refMsg.id}`})`,
-						image: msg.attachments.length > 0
-							? msg.attachments[0]
-							: undefined,
-					}).setColor("random"),
+						image: msg.attachments.length > 0 ? msg.attachments[0] : undefined,
+					}).setColor("random")
 				);
 			}
 		}
 
 		await webhook.send(message, {
 			avatar: msg.author.avatarURL(),
-			name: msg.member?.nick ?? msg.author.displayName ??
-				msg.author.username,
+			name: msg.member?.nick ?? msg.author.displayName ?? msg.author.username,
 			embeds: [
 				...messageEmbeds,
 				...msg.attachments.map((a) =>
@@ -619,13 +602,11 @@ export default class BetterEmotes extends Extension {
 							name: "Bidome bot",
 							icon_url: msg.client.user!.avatarURL(),
 						},
-						title: `${
-							getEmojiByName(
-								/.\.(png|webm|gif|jpg|jpeg)/i.test(a.filename)
-									? "frame_with_picture"
-									: "open_file_folder",
-							)
-						} ${a.filename}`,
+						title: `${getEmojiByName(
+							/.\.(png|webm|gif|jpg|jpeg)/i.test(a.filename)
+								? "frame_with_picture"
+								: "open_file_folder"
+						)} ${a.filename}`,
 						url: a.url,
 						image: {
 							url: /.\.(png|webm|gif|jpg|jpeg)/i.test(a.filename)
@@ -642,10 +623,7 @@ export default class BetterEmotes extends Extension {
 				users: [],
 			},
 			files: [
-				new MessageAttachment(
-					`B-Data-${msg.author.id}.png`,
-					dataImageExported,
-				),
+				new MessageAttachment(`B-Data-${msg.author.id}.png`, dataImageExported),
 			],
 		});
 
@@ -663,13 +641,13 @@ export default class BetterEmotes extends Extension {
 		const serverEmojisArray = this.serverEmoteCache.has(emoji.guild.id)
 			? this.serverEmoteCache.get(emoji.guild.id)
 			: (await emoji.guild.emojis.fetchAll()).map(
-				({ name, id, animated, available }) => ({
-					name: name!,
-					id: id!,
-					animated: animated!,
-					available: available!,
-				}),
-			);
+					({ name, id, animated, available }) => ({
+						name: name!,
+						id: id!,
+						animated: animated!,
+						available: available!,
+					})
+			  );
 
 		serverEmojisArray!.push({
 			name: emoji.name!,
@@ -688,17 +666,17 @@ export default class BetterEmotes extends Extension {
 		const serverEmojisArray = this.serverEmoteCache.has(emoji.guild.id)
 			? this.serverEmoteCache.get(emoji.guild.id)
 			: (await emoji.guild.emojis.fetchAll()).map(
-				({ name, id, animated, available }) => ({
-					name: name!,
-					id: id!,
-					animated: animated!,
-					available: available!,
-				}),
-			);
+					({ name, id, animated, available }) => ({
+						name: name!,
+						id: id!,
+						animated: animated!,
+						available: available!,
+					})
+			  );
 
 		this.serverEmoteCache.set(
 			emoji.guild.id,
-			serverEmojisArray!.filter((e) => e.id != emoji.id),
+			serverEmojisArray!.filter((e) => e.id != emoji.id)
 		);
 	}
 
@@ -709,13 +687,13 @@ export default class BetterEmotes extends Extension {
 		let serverEmojisArray = this.serverEmoteCache.has(before.guild.id)
 			? this.serverEmoteCache.get(before.guild.id)
 			: (await before.guild.emojis.fetchAll()).map(
-				({ name, id, animated, available }) => ({
-					name: name!,
-					id: id!,
-					animated: animated!,
-					available: available!,
-				}),
-			);
+					({ name, id, animated, available }) => ({
+						name: name!,
+						id: id!,
+						animated: animated!,
+						available: available!,
+					})
+			  );
 
 		serverEmojisArray = serverEmojisArray!.filter((e) => e.id != before.id);
 		serverEmojisArray.push({
@@ -758,8 +736,8 @@ export default class BetterEmotes extends Extension {
 	@event("guildMemberAdd")
 	async guildMemberAdd(_: Extension, member: Member) {
 		const mutualGuilds = this.memberServerCache.get(member.id) ?? [];
-		const guildsToSearch = this.serverIds ??
-			(await member.client.guilds.keys());
+		const guildsToSearch =
+			this.serverIds ?? (await member.client.guilds.keys());
 
 		for await (const guildId of guildsToSearch) {
 			const guild = await member.client.guilds.resolve(guildId);
@@ -779,8 +757,8 @@ export default class BetterEmotes extends Extension {
 	@event("guildMemberRemove")
 	async guildMemberRemove(_: Extension, member: Member) {
 		const mutualGuilds = this.memberServerCache.get(member.id) ?? [];
-		const guildsToSearch = this.serverIds ??
-			(await member.client.guilds.keys());
+		const guildsToSearch =
+			this.serverIds ?? (await member.client.guilds.keys());
 
 		for await (const guildId of guildsToSearch) {
 			const guild = await member.client.guilds.resolve(guildId);
@@ -828,8 +806,7 @@ export default class BetterEmotes extends Extension {
 				embeds: [
 					new Embed({
 						title: "Unable to edit",
-						description:
-							"This message has been deleted or I can't find it.",
+						description: "This message has been deleted or I can't find it.",
 						author: {
 							name: "Bidome bot",
 							icon_url: i.client.user!.avatarURL(),
@@ -864,9 +841,7 @@ export default class BetterEmotes extends Extension {
 			}
 
 			let webhook = webhooks.find(
-				(w) =>
-					w.name?.toLowerCase() == "bidome bot" &&
-					w.token != undefined,
+				(w) => w.name?.toLowerCase() == "bidome bot" && w.token != undefined
 			);
 
 			webhook = await Webhook.fromURL(webhook?.url + "?wait=true");
@@ -889,8 +864,7 @@ export default class BetterEmotes extends Extension {
 			}
 
 			if (!this.memberServerCache.has(i.user.id)) {
-				const guildsToSearch = this.serverIds ??
-					(await i.client.guilds.keys());
+				const guildsToSearch = this.serverIds ?? (await i.client.guilds.keys());
 
 				for await (const guildId of guildsToSearch) {
 					const guild = await i.client.guilds.resolve(guildId);
@@ -912,7 +886,7 @@ export default class BetterEmotes extends Extension {
 			for (const guild of mutualGuilds) {
 				for (const emoji of this.serverEmoteCache.get(guild) ?? []) {
 					const sameNamedEmotes = validEmojisArray.filter(
-						(e) => e.name == emoji.name,
+						(e) => e.name == emoji.name
 					);
 					if (sameNamedEmotes.length > 0) {
 						validEmojisArray.push({
@@ -927,7 +901,7 @@ export default class BetterEmotes extends Extension {
 
 			const message = BetterEmotes.emotifyMessage(
 				messageComponent.value,
-				validEmojisArray,
+				validEmojisArray
 			);
 
 			if (message == originalMessage.content) {
@@ -948,7 +922,7 @@ export default class BetterEmotes extends Extension {
 								attachments: originalMessage.attachments,
 								content: message,
 							}),
-						},
+						}
 					);
 
 					return await i.respond({
