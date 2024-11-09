@@ -50,14 +50,13 @@ export default class SetStatus extends Command {
 							"WATCHING",
 							"LISTENING",
 							"COMPETING",
-						].map(
-							(status) => ({
-								type: 2,
-								label: format(status),
-								style: "BLURPLE",
-								customID: `${status.toLowerCase()}-${now}`,
-							}),
-						),
+							"CUSTOM",
+						].map((status) => ({
+							type: 2,
+							label: format(status),
+							style: "BLURPLE",
+							customID: `${status.toLowerCase()}-${now}`,
+						})),
 					},
 				],
 			});
@@ -87,16 +86,29 @@ export default class SetStatus extends Command {
 				return;
 			} else {
 				if (!isMessageComponentInteraction(choice[0])) return;
+				const statusMap = {
+					PLAYING: 0,
+					LISTENING: 2,
+					WATCHING: 3,
+					CUSTOM: 4,
+					COMPETING: 5,
+				};
 				const type = choice[0].customID.split("-")[0].toUpperCase() as
 					| "PLAYING"
 					| "WATCHING"
 					| "LISTENING"
-					| "COMPETING";
+					| "COMPETING"
+					| "CUSTOM";
 
 				const presence = {
-					type,
+					type: statusMap[type],
 					name: ctx.argString,
 					status: ctx.client.presence.status,
+					...(type == "CUSTOM"
+						? {
+							state: ctx.argString,
+						}
+						: {}),
 				};
 
 				ctx.client.setPresence(presence);
