@@ -1,6 +1,6 @@
 {
 	"lock": false,
-	"nodeModulesDir": true,
+	"nodeModulesDir": "auto",
 	"fmt": {
 		"useTabs": true,
 		"singleQuote": false,
@@ -17,9 +17,9 @@
 		"lib": ["dom", "esnext", "deno.window"]
 	},
 	"tasks": {
-		"run": "deno run --import-map=imports.json --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run index.ts",
-		"runProd": "deno run --import-map=imports.json --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run --unstable crashHandler.ts",
-		"runWithChecks": "deno run --import-map=imports.json --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run --check index.ts",
+		"run": "deno run --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run index.ts",
+		"runProd": "deno run --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run --unstable crashHandler.ts",
+		"runWithChecks": "deno run --config=deno.jsonc --allow-net --allow-env --allow-read --allow-write --allow-run --check index.ts",
 		"types": "supabase gen types typescript --project-id gukjxyrpjvwptnabpchl > assets/db/database.types.ts && deno fmt --config=deno.jsonc ./assets/db/database.types.ts",
 		"fmt": "deno fmt --config=deno.jsonc ./",
 		"lint": "deno lint --config=deno.jsonc ./"
