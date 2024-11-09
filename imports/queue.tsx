@@ -80,6 +80,7 @@ nodes.on("playerMoved", async (player, oldChannel, newChannel) => {
 
 nodes.on("playerDisconnected", (player) => {
 	const handlers = playerEventHandlers.get(player.guildId);
+	queues.get(player.guildId)?.deleteQueue();
 	if (handlers != undefined) {
 		handlers.playerDisconnected();
 	}
@@ -190,30 +191,31 @@ export class ServerQueue {
 	}
 
 	public async deleteQueue(admin = false) {
-		if (this.queueMessage != undefined) {
-			await this.queueMessage.edit({
-				embeds: [
-					new Embed({
-						author: {
-							name: "Bidome bot",
-							icon_url: client.user!.avatarURL(),
-						},
-						title: "Finished queue",
-						description: admin
-							? "I have stopped the player"
-							: "I have finished playing this queue",
-					}).setColor("random"),
-				],
-				components: [],
-			});
-		}
-		queues.delete(this.guildId);
-		playerEventHandlers.delete(this.guildId);
+		if (queues.has(this.guildId)) {
+			if (this.queueMessage != undefined) {
+				await this.queueMessage.edit({
+					embeds: [
+						new Embed({
+							author: {
+								name: "Bidome bot",
+								icon_url: client.user!.avatarURL(),
+							},
+							title: "Finished queue",
+							description: admin
+								? "I have stopped the player"
+								: "I have finished playing this queue",
+						}).setColor("random"),
+					],
+					components: [],
+				});
+			}
+			queues.delete(this.guildId);
+			playerEventHandlers.delete(this.guildId);
 
-		this.player.disconnect();
-		await this.player.stop({
-			destroy: true,
-		});
+			this.player.queue.clear();
+			this.player.disconnect();
+			this.player.destroy();
+		}
 	}
 
 	private async makeBotSpeak(channelObject: VoiceChannel) {
@@ -426,9 +428,12 @@ export const initLava = (bot: CommandClient) => {
 
 	console.log("[Lavalink] Initializing nodes");
 
-	// The full payload is simulated because harmony strips it for some reason
 	bot.on("raw", (evt, payload) => {
-		nodes.packetUpdate({ t: evt, s: 5, op: 0, d: payload });
+		if (!["VOICE_STATE_UPDATE", "VOICE_SERVER_UPDATE"].includes(evt)) {
+			return;
+		}
+		// The full payload is simulated because harmony strips it for some reason
+		nodes.packetUpdate({ t: evt, d: payload });
 	});
 
 	nodes.init(bot.user!.id);
