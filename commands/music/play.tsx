@@ -10,20 +10,20 @@ import {
 } from "harmony";
 import { doPermCheck, nodes, queues, ServerQueue } from "queue";
 import { Track } from "lavadeno";
-import { getEmojiByName } from "emoji";
+import { emoji } from "emoji";
 import { shuffleArray } from "tools";
 import { getEmote } from "i18n";
 
 const shuffleCommands = ["shuffleplay", "sp"];
 
 export default class Play extends Command {
-	name = "play";
-	aliases = ["p", "enqueue", "add", ...shuffleCommands];
-	category = "music";
-	description = "Play a song";
-	usage = ["play <song query or URL>", "shuffleplay <playlist URL>"];
+	override name = "play";
+	override aliases = ["p", "enqueue", "add", ...shuffleCommands];
+	override category = "music";
+	override description = "Play a song";
+	override usage = ["play <song query or URL>", "shuffleplay <playlist URL>"];
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		if (ctx.argString == "") {
 			await ctx.message.reply(undefined, {
@@ -146,11 +146,11 @@ export default class Play extends Command {
 						const now = Date.now();
 
 						const emojiMap = {
-							0: getEmojiByName("one"),
-							1: getEmojiByName("two"),
-							2: getEmojiByName("three"),
-							3: getEmojiByName("four"),
-							4: getEmojiByName("five"),
+							0: emoji("one"),
+							1: emoji("two"),
+							2: emoji("three"),
+							3: emoji("four"),
+							4: emoji("five"),
 						};
 
 						await message.edit(undefined, {

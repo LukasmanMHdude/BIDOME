@@ -1,12 +1,12 @@
 import { Command, CommandContext, Embed } from "harmony";
 
 export default class ServerInfo extends Command {
-	name = "serverinfo";
-	aliases = ["si", "server-info", "guildinfo", "gi"];
-	category = "utils";
-	description = "Get information regarding this server";
-	usage = "Serverinfo";
-	async execute(ctx: CommandContext) {
+	override name = "serverinfo";
+	override aliases = ["si", "server-info", "guildinfo", "gi"];
+	override category = "utils";
+	override description = "Get information regarding this server";
+	override usage = "Serverinfo";
+	override async execute(ctx: CommandContext) {
 		const membersArray = (await ctx.message.guild?.members.array()) ?? [];
 		const owner = (await ctx.message.guild!.members.resolve(
 			ctx.message.guild!.ownerID as string,

@@ -4,11 +4,11 @@ import { createEmbedFromLangData, getUserLanguage } from "i18n";
 import { createReminder, getReminders } from "settings";
 
 export default class RemindMe extends Command {
-	name = "remindme";
-	aliases = ["createreminder"];
-	category = "utils";
-	description = "Create a reminder";
-	async execute(ctx: CommandContext) {
+	override name = "remindme";
+	override aliases = ["createreminder"];
+	override category = "utils";
+	override description = "Create a reminder";
+	override async execute(ctx: CommandContext) {
 		const lang = await getUserLanguage(ctx.author);
 		const reminders = await getReminders(ctx.author.id);
 
@@ -62,7 +62,8 @@ export default class RemindMe extends Command {
 						],
 					});
 				} else {
-					const [base, ...parsedTimestamps] = timestamp.split(",")
+					const [base, ...parsedTimestamps] = timestamp
+						.split(",")
 						.sort((a, b) => toMs(a) - toMs(b));
 					const baseParsed = toMs(base);
 
@@ -98,9 +99,10 @@ export default class RemindMe extends Command {
 						future_sends: parsedTimestamps,
 					});
 
-					const time =
-						(new Date().getTime() / 1000 + baseParsed / 1000)
-							.toFixed(0);
+					const time = (
+						new Date().getTime() / 1000 +
+						baseParsed / 1000
+					).toFixed(0);
 
 					await ctx.message.reply(undefined, {
 						embeds: [

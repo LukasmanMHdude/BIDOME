@@ -9,11 +9,11 @@ import {
 import { format } from "tools";
 
 export default class PostUpdate extends Command {
-	name = "postupdate";
-	ownerOnly = true;
-	category = "dev";
-	description = "Post an update to the update channel";
-	async execute(ctx: CommandContext) {
+	override name = "postupdate";
+	override ownerOnly = true;
+	override category = "dev";
+	override description = "Post an update to the update channel";
+	override async execute(ctx: CommandContext) {
 		const message = await ctx.message.reply(undefined, {
 			embeds: [
 				new Embed({
@@ -25,7 +25,7 @@ export default class PostUpdate extends Command {
 					description:
 						"Please send the update summary you want to post",
 					footer: {
-						"text":
+						text:
 							"Type cancel to cancel and empty to not post a summary",
 					},
 				}).setColor("random"),
@@ -67,7 +67,7 @@ export default class PostUpdate extends Command {
 					title: "Post update",
 					description: "Please send an added feature changelog",
 					footer: {
-						"text":
+						text:
 							"Type cancel to cancel and empty to not post a added feature changelog",
 					},
 				}).setColor("random"),
@@ -110,7 +110,7 @@ export default class PostUpdate extends Command {
 					title: "Post update",
 					description: "Please send a bugfix changelog",
 					footer: {
-						"text":
+						text:
 							"Type cancel to cancel and empty to not post a bugfix changelog",
 					},
 				}).setColor("random"),
@@ -230,7 +230,8 @@ export default class PostUpdate extends Command {
 		);
 
 		if (
-			button == undefined || !isMessageComponentInteraction(button) ||
+			button == undefined ||
+			!isMessageComponentInteraction(button) ||
 			(isMessageComponentInteraction(button) &&
 				button.customID.startsWith("cancel"))
 		) {
@@ -249,9 +250,9 @@ export default class PostUpdate extends Command {
 			});
 			return;
 		} else {
-			const channel = await ctx.guild!.channels.get(
+			const channel = (await ctx.guild!.channels.get(
 				"1014029994869129317",
-			) as NewsChannel;
+			)) as NewsChannel;
 
 			await channel.send({
 				embeds: [updateEmbed],

@@ -1,5 +1,4 @@
 /** @jsxImportSource jsr:@mary/jsx */
-import type { JSXNode } from "jsr:@mary/jsx";
 import { setup, tw } from "npm:twind";
 import { getStyleTag, virtualSheet } from "npm:twind/sheets";
 import * as colors from "npm:twind/colors";
@@ -269,7 +268,7 @@ const Component = ({
 	);
 };
 
-export default async function Card(props: ComponentProps) {
+export default function Card(props: ComponentProps) {
 	sheet.reset();
 	const body = Component(props);
 	const styleTag = getStyleTag(sheet);

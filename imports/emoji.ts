@@ -7,7 +7,7 @@ import {
 	people,
 	symbols,
 	travel,
-} from "https://deno.land/x/discord_emoji@v2.4.0/mod.ts";
+} from "https://deno.land/x/discord_emoji@v2.5.1/mod.ts";
 
 type EmojiKeys =
 	| keyof typeof activity
@@ -36,18 +36,4 @@ export const emoji = (name: EmojiKeys) => {
 		if (emojiJson[name]) return emojiJson[name];
 	}
 	return undefined;
-};
-
-// TODO: Migrate commands to new emoji system
-
-import { emojiData } from "https://deno.land/x/getmoji@1.2.4/emojiData.ts";
-// Modified from getmoji/mod.ts
-
-const filterEmoji = (emojiName: string) => {
-	return emojiData.filter((data) => data.name === emojiName);
-};
-
-export const getEmojiByName = (name: string) => {
-	const filteredData = filterEmoji(name);
-	return filteredData.length ? filteredData[0].char : "emoji not found";
 };

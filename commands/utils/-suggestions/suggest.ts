@@ -9,13 +9,13 @@ import {
 import { truncateString } from "tools";
 
 export default class Suggest extends Command {
-	name = "suggest";
-	description = "Suggest something to the server";
-	category = "utils";
-	aliases = ["suggestion"];
-	cooldown = 1 * 60 * 1000;
+	override name = "suggest";
+	override description = "Suggest something to the server";
+	override category = "utils";
+	override aliases = ["suggestion"];
+	override cooldown = 1 * 60 * 1000;
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		const lang = await getUserLanguage(ctx.author.id);
 		const suggestionChannels = await getSuggestionChannels(ctx.guild!.id);
 		if (suggestionChannels.suggestion_channel == undefined) {

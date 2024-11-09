@@ -8,13 +8,13 @@ import { format } from "tools";
 import { emoji } from "emoji";
 
 export default class RPS extends Command {
-	name = "rps";
-	aliases = ["rockpaperscissors"];
-	description = "Play RPS against the bot";
-	usage = "Rps";
-	category = "fun";
+	override name = "rps";
+	override aliases = ["rockpaperscissors"];
+	override description = "Play RPS against the bot";
+	override usage = "Rps";
+	override category = "fun";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		const options = ["scissors", "rock", "paper"];
 		const emojis = [
 			emoji("scissors"),

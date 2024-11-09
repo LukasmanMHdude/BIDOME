@@ -2,23 +2,25 @@ import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 
 export default class Stop extends Command {
-	name = "stop";
-	aliases = [
+	override name = "stop";
+	override aliases = [
 		"disconnect",
 		"dc",
 		"fuckoff",
 		"leave",
 		"pleaseshutthefuckupnow",
 	];
-	category = "music";
-	description = "Disconnects from the voice channel and stops playing";
+	override category = "music";
+	override description =
+		"Disconnects from the voice channel and stops playing";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const queue = queues.get(ctx.guild.id);
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (
-			queue == undefined || botState == undefined ||
+			queue == undefined ||
+			botState == undefined ||
 			botState.channel == undefined
 		) {
 			await ctx.message.reply(undefined, {

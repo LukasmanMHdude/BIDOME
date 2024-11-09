@@ -1,4 +1,4 @@
-const envfile = (Deno.readTextFileSync(".env")).split("\n");
+const envfile = Deno.readTextFileSync(".env").split("\n");
 
 for (const line of envfile) {
 	const [key, ...value] = line.split("=");

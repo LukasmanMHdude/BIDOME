@@ -1,13 +1,13 @@
 import { Command, CommandContext, Embed } from "harmony";
 
 export default class Unload extends Command {
-	name = "unload";
-	aliases = ["unloadcommand", "unloadcmd"];
-	description = "Unload a specific command";
-	category = "dev";
-	usage = "unload <command>";
-	ownerOnly = true;
-	async execute(ctx: CommandContext) {
+	override name = "unload";
+	override aliases = ["unloadcommand", "unloadcmd"];
+	override description = "Unload a specific command";
+	override category = "dev";
+	override usage = "unload <command>";
+	override ownerOnly = true;
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString === "") {
 			await ctx.message.reply(undefined, {
 				embeds: [

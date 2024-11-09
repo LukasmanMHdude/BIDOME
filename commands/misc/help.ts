@@ -9,12 +9,13 @@ import { getString } from "i18n";
 import { format } from "tools";
 
 export default class Help extends Command {
-	name = "help";
-	category = "misc";
-	aliases = ["cmds", "commands"];
-	usage = "Help [command]";
-	description = "Get a list of commands or information regarding a command";
-	async execute(ctx: CommandContext) {
+	override name = "help";
+	override category = "misc";
+	override aliases = ["cmds", "commands"];
+	override usage = "Help [command]";
+	override description =
+		"Get a list of commands or information regarding a command";
+	override async execute(ctx: CommandContext) {
 		const userLanguage = "en";
 		if (ctx.argString != "") {
 			if (!ctx.client.commands.exists(ctx.argString)) {
@@ -71,11 +72,11 @@ export default class Help extends Command {
 										ctx.client.commands.find(ctx.argString)!
 												.ownerOnly
 											? "Owner only"
-											: ctx.client.commands.find(
+											: (ctx.client.commands.find(
 												ctx.argString,
 											)!
 												.userPermissions ??
-												"No permissions required",
+												"No permissions required"),
 										ctx.client.commands.find(ctx.argString)!
 											.category ??
 											"Uncategorized",

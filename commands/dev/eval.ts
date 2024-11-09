@@ -4,13 +4,13 @@ import { Command, CommandContext, Embed } from "harmony";
 import * as harmony from "harmony";
 
 export default class Eval extends Command {
-	name = "eval";
-	ownerOnly = true;
-	category = "dev";
-	aliases = ["execute"];
-	description = "Execute code";
-	usage = "Eval <code>";
-	async execute(ctx: CommandContext) {
+	override name = "eval";
+	override ownerOnly = true;
+	override category = "dev";
+	override aliases = ["execute"];
+	override description = "Execute code";
+	override usage = "Eval <code>";
+	override async execute(ctx: CommandContext) {
 		let code = ctx.argString ?? "";
 		if (code.startsWith("```ts") || code.startsWith(" ```ts")) {
 			code = code.substring(code.split("\n")[0].length, code.length - 3);
@@ -40,10 +40,7 @@ export default class Eval extends Command {
 					return await _func();
 				})();
 			`)) ?? "No output!"
-			}`.replace(
-				ctx.client.token!,
-				"lol you thought",
-			);
+			}`.replace(ctx.client.token!, "lol you thought");
 		} catch (e: unknown) {
 			const executed = `${e ?? "No output!"}`.replace(
 				ctx.client.token!,

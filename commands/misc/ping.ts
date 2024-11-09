@@ -1,11 +1,11 @@
 import { Command, CommandContext, Embed } from "harmony";
 
 export default class Ping extends Command {
-	name = "ping";
-	category = "misc";
-	description = "Get the bot's ping";
-	usage = "Ping";
-	async execute(ctx: CommandContext) {
+	override name = "ping";
+	override category = "misc";
+	override description = "Get the bot's ping";
+	override usage = "Ping";
+	override async execute(ctx: CommandContext) {
 		const now = new Date();
 		const message = await ctx.message.reply(undefined, {
 			embeds: [

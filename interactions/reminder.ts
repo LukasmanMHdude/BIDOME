@@ -6,8 +6,8 @@ export async function button(i: MessageComponentInteraction) {
 	if (i.customID.startsWith("delrem_")) {
 		const lang = await getUserLanguage(i.user.id);
 		const reminderID = i.customID.substring("delrem_".length);
-		const reminder = getReminders().filter((r) =>
-			r.id.toString() == reminderID
+		const reminder = getReminders().filter(
+			(r) => r.id.toString() == reminderID,
 		)[0];
 
 		if (reminder != undefined) {

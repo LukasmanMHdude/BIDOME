@@ -2,12 +2,12 @@ import { Command, CommandContext, Embed } from "harmony";
 import { getEmote } from "i18n";
 
 export default class Botinfo extends Command {
-	name = "botinfo";
-	category = "misc";
-	aliases = ["botstats", "info"];
-	description = "Get bot information";
-	usage = "Botinfo";
-	async execute(ctx: CommandContext) {
+	override name = "botinfo";
+	override category = "misc";
+	override aliases = ["botstats", "info"];
+	override description = "Get bot information";
+	override usage = "Botinfo";
+	override async execute(ctx: CommandContext) {
 		const msg = await ctx.message.reply(undefined, {
 			embeds: [
 				new Embed({

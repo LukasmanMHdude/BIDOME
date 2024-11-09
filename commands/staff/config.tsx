@@ -10,14 +10,14 @@ import {
 import { createEmbedFromLangData, getString, getUserLanguage } from "i18n";
 
 export default class Config extends Command {
-	name = "config";
-	aliases = ["settings", "options"];
-	category = "staff";
-	description = "Change settings regarding bidome";
-	usage = "Config";
-	userPermissions = "MANAGE_GUILD";
+	override name = "config";
+	override aliases = ["settings", "options"];
+	override category = "staff";
+	override description = "Change settings regarding bidome";
+	override usage = "Config";
+	override userPermissions = "MANAGE_GUILD";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		const lang = await getUserLanguage(ctx.author.id);
 		await ctx.message.reply({
 			embeds: [

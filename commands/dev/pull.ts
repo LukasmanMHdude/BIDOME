@@ -1,13 +1,13 @@
 import { Command, CommandContext, Embed } from "harmony";
 
 export default class Pull extends Command {
-	name = "pull";
-	aliases = ["ghpull", "githubpull"];
-	description = "Pull the latest changes from the repository";
-	category = "dev";
-	usage = "pull";
-	ownerOnly = true;
-	async execute(ctx: CommandContext) {
+	override name = "pull";
+	override aliases = ["ghpull", "githubpull"];
+	override description = "Pull the latest changes from the repository";
+	override category = "dev";
+	override usage = "pull";
+	override ownerOnly = true;
+	override async execute(ctx: CommandContext) {
 		const message = await ctx.message.reply(undefined, {
 			embeds: [
 				new Embed({
@@ -52,7 +52,9 @@ export default class Pull extends Command {
 					},
 					title: "Bidome github",
 					description: `Pulled changes with output: \`\`\`${
-						strings.join("\n")
+						strings.join(
+							"\n",
+						)
 					}\`\`\``,
 				}).setColor("random"),
 			],

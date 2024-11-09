@@ -87,12 +87,11 @@ export const getDiscordImage = async (url: string) => {
 				`./.cache/${guildId}/${userId}/${imageType}/${hash}`,
 				new Uint8Array(image),
 			);
-			newCache
-				.guildMemberData[guildId][userId][
-					typeMap[imageType as "avatars" | "banners" | "icons"] as
-						| "avatarHash"
-						| "bannerHash"
-				] = hash;
+			newCache.guildMemberData[guildId][userId][
+				typeMap[imageType as "avatars" | "banners" | "icons"] as
+					| "avatarHash"
+					| "bannerHash"
+			] = hash;
 			await Deno.writeTextFile(
 				"./.cache/data.json",
 				JSON.stringify(newCache),
@@ -103,12 +102,11 @@ export const getDiscordImage = async (url: string) => {
 		const [_, id, hash] = newRoute.split("/");
 		newCache.userData[id] ??= {};
 
-		const currentValue = newCache.userData[id]
-			?.[
-				typeMap[type as "avatars" | "banners" | "icons"] as
-					| "avatarHash"
-					| "bannerHash"
-			] as string;
+		const currentValue = newCache.userData[id]?.[
+			typeMap[type as "avatars" | "banners" | "icons"] as
+				| "avatarHash"
+				| "bannerHash"
+		] as string;
 		if (currentValue != undefined && currentValue == hash) {
 			return await Deno.readFile(`./.cache/${id}/${type}/${hash}`);
 		} else {
@@ -122,12 +120,11 @@ export const getDiscordImage = async (url: string) => {
 				new Uint8Array(image),
 			);
 
-			newCache
-				.userData[id]![
-					typeMap[type as "avatars" | "banners" | "icons"] as
-						| "avatarHash"
-						| "bannerHash"
-				] = hash;
+			newCache.userData[id]![
+				typeMap[type as "avatars" | "banners" | "icons"] as
+					| "avatarHash"
+					| "bannerHash"
+			] = hash;
 			await Deno.writeTextFile(
 				"./.cache/data.json",
 				JSON.stringify(newCache),

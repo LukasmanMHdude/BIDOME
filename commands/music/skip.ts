@@ -2,12 +2,12 @@ import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 
 export default class Skip extends Command {
-	name = "skip";
-	aliases = ["s"];
-	category = "music";
-	description = "Vote to skip the queue";
+	override name = "skip";
+	override aliases = ["s"];
+	override category = "music";
+	override description = "Vote to skip the queue";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const queue = queues.get(ctx.guild.id);
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);

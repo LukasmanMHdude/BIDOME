@@ -9,7 +9,8 @@ export async function button(i: MessageComponentInteraction) {
 	if (i.customID == "stop-song") {
 		const botState = await i.guild!.voiceStates.get(i.client.user!.id);
 		if (
-			!queues.has(i.guild!.id) || botState == undefined ||
+			!queues.has(i.guild!.id) ||
+			botState == undefined ||
 			botState.channel == undefined
 		) {
 			await i.respond({

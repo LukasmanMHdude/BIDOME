@@ -2,11 +2,11 @@ import { Command, CommandContext, Embed } from "harmony";
 import { toMs } from "tools";
 
 export default class ConvertTime extends Command {
-	name = "converttime";
-	aliases = ["converttimestamp"];
-	category = "utils";
-	description = "Convert a timestamp to a singular unit value";
-	async execute(ctx: CommandContext) {
+	override name = "converttime";
+	override aliases = ["converttimestamp"];
+	override category = "utils";
+	override description = "Convert a timestamp to a singular unit value";
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString == "") {
 			await ctx.message.reply(undefined, {
 				embeds: [

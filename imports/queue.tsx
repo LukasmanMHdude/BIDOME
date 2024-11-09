@@ -16,7 +16,7 @@ import {
 } from "./harmony.ts";
 import { Manager, Player, type Track, type TTrackEndType } from "./lavadeno.ts";
 import { formatMs } from "./tools.ts";
-import { getEmojiByName } from "./emoji.ts";
+import { emoji } from "./emoji.ts";
 import { getConfig } from "./settings.ts";
 
 export let client: CommandClient;
@@ -367,34 +367,32 @@ export class ServerQueue {
 					<ActionRow>
 						<Button
 							style={"grey"}
-							emoji={{ name: getEmojiByName("question") }}
+							emoji={{ name: emoji("question") }}
 							id={"help-song"}
 						/>
 						<Button
 							style={"red"}
 							emoji={{
-								name: getEmojiByName("black_square_for_stop"),
+								name: emoji("stop_button"),
 							}}
 							id={"stop-song"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("fast_forward") }}
+							emoji={{ name: emoji("fast_forward") }}
 							id={"skip-song"}
 						/>
 						<Button
 							style={"green"}
 							emoji={{
-								name: getEmojiByName(
-									"twisted_rightwards_arrows",
-								),
+								name: emoji("twisted_rightwards_arrows"),
 							}}
 							id={"shuffle-songs"}
 						/>
 						<Button
 							style={"grey"}
 							emoji={{
-								name: getEmojiByName("arrows_counterclockwise"),
+								name: emoji("arrows_counterclockwise"),
 							}}
 							id={"refresh-songs"}
 						/>

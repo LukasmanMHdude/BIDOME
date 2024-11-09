@@ -2,11 +2,11 @@ import { Command, CommandContext, Embed } from "harmony";
 import { getPrefixes } from "settings";
 
 export default class Prefix extends Command {
-	name = "prefix";
-	category = "misc";
-	description = "Get the bot's prefix";
-	usage = "Prefix";
-	async execute(ctx: CommandContext) {
+	override name = "prefix";
+	override category = "misc";
+	override description = "Get the bot's prefix";
+	override usage = "Prefix";
+	override async execute(ctx: CommandContext) {
 		await ctx.message.reply(undefined, {
 			embeds: [
 				new Embed({

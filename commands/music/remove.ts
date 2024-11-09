@@ -2,12 +2,12 @@ import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 
 export default class Remove extends Command {
-	name = "remove";
-	aliases = ["rm"];
-	category = "music";
-	description = "Remove a song from the queue";
+	override name = "remove";
+	override aliases = ["rm"];
+	override category = "music";
+	override description = "Remove a song from the queue";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (

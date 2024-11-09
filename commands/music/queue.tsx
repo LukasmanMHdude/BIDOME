@@ -8,16 +8,16 @@ import {
 	fragment,
 } from "harmony";
 import { queues } from "queue";
-import { getEmojiByName } from "emoji";
+import { emoji } from "emoji";
 import { formatMs } from "tools";
 
 export default class Queue extends Command {
-	name = "queue";
-	aliases = ["q"];
-	category = "music";
-	description = "View the current queue";
+	override name = "queue";
+	override aliases = ["q"];
+	override category = "music";
+	override description = "View the current queue";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (
@@ -43,16 +43,16 @@ export default class Queue extends Command {
 			});
 		} else {
 			const emojiMap = [
-				getEmojiByName("arrow_forward"),
-				getEmojiByName("one"),
-				getEmojiByName("two"),
-				getEmojiByName("three"),
-				getEmojiByName("four"),
-				getEmojiByName("five"),
-				getEmojiByName("six"),
-				getEmojiByName("seven"),
-				getEmojiByName("eight"),
-				getEmojiByName("nine"),
+				emoji("arrow_forward"),
+				emoji("one"),
+				emoji("two"),
+				emoji("three"),
+				emoji("four"),
+				emoji("five"),
+				emoji("six"),
+				emoji("seven"),
+				emoji("eight"),
+				emoji("nine"),
 			];
 			const queueEntries = queue.player.queue.tracks;
 
@@ -75,7 +75,9 @@ export default class Queue extends Command {
 							icon_url: ctx.author.avatarURL(),
 							text:
 								`Songs in queue: ${queueEntries.length} | Length: ${
-									formatMs(queue.queueLength)
+									formatMs(
+										queue.queueLength,
+									)
 								}`,
 						},
 					}).setColor("random"),
@@ -88,7 +90,7 @@ export default class Queue extends Command {
 								disabled={true}
 								id={"queuepg-0"}
 								emoji={{
-									name: getEmojiByName("arrow_left"),
+									name: emoji("arrow_left"),
 								}}
 							/>
 							<Button
@@ -96,7 +98,7 @@ export default class Queue extends Command {
 								id={"queuepg-1"}
 								disabled={queueEntries.length <= 10}
 								emoji={{
-									name: getEmojiByName("arrow_right"),
+									name: emoji("arrow_right"),
 								}}
 							/>
 						</ActionRow>

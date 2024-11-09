@@ -7,7 +7,7 @@ import {
 	InteractionResponseType,
 	MessageComponentInteraction,
 } from "harmony";
-import { getEmojiByName } from "emoji";
+import { emoji } from "emoji";
 import { queues } from "queue";
 import { formatMs } from "tools";
 
@@ -39,18 +39,16 @@ export async function button(i: MessageComponentInteraction) {
 
 				const convertNumberToEmoji = (number: number) => {
 					const emojiMap = [
-						pageOffset < 1
-							? getEmojiByName("arrow_forward")
-							: getEmojiByName("zero"),
-						getEmojiByName("one"),
-						getEmojiByName("two"),
-						getEmojiByName("three"),
-						getEmojiByName("four"),
-						getEmojiByName("five"),
-						getEmojiByName("six"),
-						getEmojiByName("seven"),
-						getEmojiByName("eight"),
-						getEmojiByName("nine"),
+						pageOffset < 1 ? emoji("arrow_forward") : emoji("zero"),
+						emoji("one"),
+						emoji("two"),
+						emoji("three"),
+						emoji("four"),
+						emoji("five"),
+						emoji("six"),
+						emoji("seven"),
+						emoji("eight"),
+						emoji("nine"),
 					];
 					let str = "";
 
@@ -85,7 +83,9 @@ export async function button(i: MessageComponentInteraction) {
 								icon_url: i.user.avatarURL(),
 								text:
 									`Songs in queue: ${queue.player.queue.size} | Length: ${
-										formatMs(queue.queueLength)
+										formatMs(
+											queue.queueLength,
+										)
 									}`,
 							},
 						}).setColor("random"),
@@ -100,7 +100,7 @@ export async function button(i: MessageComponentInteraction) {
 										? "queuepg-0"
 										: `queuepg-${pageOffset - 1}`}
 									emoji={{
-										name: getEmojiByName("arrow_left"),
+										name: emoji("arrow_left"),
 									}}
 								/>
 								<Button
@@ -109,7 +109,7 @@ export async function button(i: MessageComponentInteraction) {
 									disabled={queue.player.queue.size <=
 										startingValue + 10}
 									emoji={{
-										name: getEmojiByName("arrow_right"),
+										name: emoji("arrow_right"),
 									}}
 								/>
 							</ActionRow>

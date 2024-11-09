@@ -1,5 +1,5 @@
 import { getRandomInteger } from "../tools.ts";
-import { getEmojiByName } from "../emoji.ts";
+import { emoji } from "../emoji.ts";
 import {
 	ActionRow,
 	BotUI,
@@ -167,13 +167,13 @@ export class TicTacToeGame {
 				: [
 					`${
 						this.currentPlayersTurn == "x"
-							? getEmojiByName("arrow_forward")
-							: "🟦"
+							? emoji("arrow_forward")
+							: emoji("blue_square")
 					} ${this.x == "ai" ? "AI" : `<@!${this.x.id}>`}`,
 					`${
 						this.currentPlayersTurn == "o"
-							? getEmojiByName("arrow_forward")
-							: "🟦"
+							? emoji("arrow_forward")
+							: emoji("blue_square")
 					} ${this.o == "ai" ? "AI" : `<@!${this.o.id}>`}`,
 				].join("\n"),
 			footer: {

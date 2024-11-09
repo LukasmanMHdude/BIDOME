@@ -50,13 +50,13 @@ export const getBadges = (
 };
 
 export default class UserInfo extends Command {
-	name = "userinfo";
-	aliases = ["ui"];
-	description = "Get information about a user";
-	category = "utils";
-	usage = "userinfo [user]";
+	override name = "userinfo";
+	override aliases = ["ui"];
+	override description = "Get information about a user";
+	override category = "utils";
+	override usage = "userinfo [user]";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		const userId = ctx.argString != ""
 			? /<@!?[0-9]{17,19}>/.test(ctx.argString.trim())
 				? ctx.argString.replace(/<@!?([0-9]{17,19})>/, "$1")
@@ -170,15 +170,11 @@ export default class UserInfo extends Command {
 									"offline",
 							),
 							await member.roles.size(),
-							(
-								await member.roles.array()
-							)
+							(await member.roles.array())
 								.slice(0, 46)
 								.map((r) => `<@&${r.id}>`)
 								.join(", ") +
-								((
-										await member.roles.array()
-									).sort((r1, r2) => {
+								((await member.roles.array()).sort((r1, r2) => {
 										return r1.name.localeCompare(r2.name);
 									}).length > 46
 									? "..."

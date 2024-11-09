@@ -2,17 +2,18 @@ import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 
 export default class Volume extends Command {
-	name = "volume";
-	aliases = ["vol"];
-	category = "music";
-	description = "Change the volume of the player";
+	override name = "volume";
+	override aliases = ["vol"];
+	override category = "music";
+	override description = "Change the volume of the player";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const queue = queues.get(ctx.guild.id);
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (
-			queue == undefined || botState == undefined ||
+			queue == undefined ||
+			botState == undefined ||
 			botState.channel == undefined
 		) {
 			await ctx.message.reply(undefined, {

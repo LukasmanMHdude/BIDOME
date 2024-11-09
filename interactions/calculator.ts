@@ -76,9 +76,17 @@ export async function button(i: MessageComponentInteraction) {
 				}
 			}
 
+			const allowedChars = "0123456789.+-*/^()";
+
 			try {
 				// This would be a security hazard but it's limited to numbers and operators
-				solution = eval(previousInputs.replace(/\^/g, "**"));
+				solution = eval(
+					previousInputs
+						.split("")
+						.filter((c) => allowedChars.includes(c))
+						.join("")
+						.replace(/\^/g, "**"),
+				);
 			} catch {
 				solution = "Error";
 			}

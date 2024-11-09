@@ -2,12 +2,12 @@ import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 
 export default class QueueLoop extends Command {
-	name = "queueloop";
-	aliases = ["replayqueue", "qloop", "ql"];
-	category = "music";
-	description = "Loop the current queue";
+	override name = "queueloop";
+	override aliases = ["replayqueue", "qloop", "ql"];
+	override category = "music";
+	override description = "Loop the current queue";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (

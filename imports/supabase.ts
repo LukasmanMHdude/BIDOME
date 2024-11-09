@@ -1,4 +1,4 @@
-export * from "npm:@supabase/supabase-js@2.42.7";
+export * from "jsr:@supabase/supabase-js@2.46.1";
 import { createClient } from "./supabase.ts";
 import { Database } from "../assets/db/database.types.ts";
 export type { Database };

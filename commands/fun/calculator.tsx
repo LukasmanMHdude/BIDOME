@@ -1,4 +1,4 @@
-import { getEmojiByName } from "emoji";
+import { emoji } from "emoji";
 import {
 	ActionRow,
 	BotUI,
@@ -10,12 +10,12 @@ import {
 } from "harmony";
 
 export default class Calculator extends Command {
-	name = "calculator";
-	description = 'Who doesn\'t like a good ol "MTX 8040 Tl 16gb"';
-	aliases = ["calc", "8040tl", "shitty84tl", "math"];
-	usage = "calculator";
-	category = "fun";
-	async execute(ctx: CommandContext) {
+	override name = "calculator";
+	override description = 'Who doesn\'t like a good ol "MTX 8040 Tl 16gb"';
+	override aliases = ["calc", "8040tl", "shitty84tl", "math"];
+	override usage = "calculator";
+	override category = "fun";
+	override async execute(ctx: CommandContext) {
 		await ctx.message.reply(undefined, {
 			embeds: [
 				new Embed({
@@ -56,12 +56,12 @@ export default class Calculator extends Command {
 						<Button style={"blurple"} label={")"} id={"calc-cpa"} />
 						<Button
 							style={"red"}
-							emoji={{ name: getEmojiByName("arrow_left") }}
+							emoji={{ name: emoji("arrow_left") }}
 							id={"calc-bck"}
 						/>
 						<Button
 							style={"red"}
-							emoji={{ name: getEmojiByName("wastebasket") }}
+							emoji={{ name: emoji("wastebasket") }}
 							id={"calc-clr"}
 						/>
 					</ActionRow>
@@ -69,23 +69,23 @@ export default class Calculator extends Command {
 					<ActionRow>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("seven") }}
+							emoji={{ name: emoji("seven") }}
 							id={"calc-7"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("eight") }}
+							emoji={{ name: emoji("eight") }}
 							id={"calc-8"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("nine") }}
+							emoji={{ name: emoji("nine") }}
 							id={"calc-9"}
 						/>
 						<Button
 							style={"green"}
 							emoji={{
-								name: getEmojiByName("heavy_division_sign"),
+								name: emoji("heavy_division_sign"),
 							}}
 							id={"calc-div"}
 						/>
@@ -94,23 +94,23 @@ export default class Calculator extends Command {
 					<ActionRow>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("four") }}
+							emoji={{ name: emoji("four") }}
 							id={"calc-4"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("five") }}
+							emoji={{ name: emoji("five") }}
 							id={"calc-5"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("six") }}
+							emoji={{ name: emoji("six") }}
 							id={"calc-6"}
 						/>
 						<Button
 							style={"green"}
 							emoji={{
-								name: getEmojiByName("heavy_multiplication_x"),
+								name: emoji("heavy_multiplication_x"),
 							}}
 							id={"calc-mul"}
 						/>
@@ -119,22 +119,22 @@ export default class Calculator extends Command {
 					<ActionRow>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("one") }}
+							emoji={{ name: emoji("one") }}
 							id={"calc-1"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("two") }}
+							emoji={{ name: emoji("two") }}
 							id={"calc-2"}
 						/>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("three") }}
+							emoji={{ name: emoji("three") }}
 							id={"calc-3"}
 						/>
 						<Button
 							style={"green"}
-							emoji={{ name: getEmojiByName("heavy_minus_sign") }}
+							emoji={{ name: emoji("heavy_minus_sign") }}
 							id={"calc-sub"}
 						/>
 					</ActionRow>
@@ -142,20 +142,24 @@ export default class Calculator extends Command {
 					<ActionRow>
 						<Button
 							style={"blurple"}
-							emoji={{ name: getEmojiByName("zero") }}
+							emoji={{ name: emoji("zero") }}
 							id={"calc-0"}
 						/>
 						<Button
 							style={"blurple"}
 							emoji={{
-								name: getEmojiByName("black_circle_for_record"),
+								name: emoji("record_button"),
 							}}
 							id={"calc-dot"}
 						/>
-						<Button style={"blurple"} label={"^"} id={"calc-exp"} />
+						<Button
+							style={"blurple"}
+							emoji={{ name: emoji("arrow_up") }}
+							id={"calc-exp"}
+						/>
 						<Button
 							style={"green"}
-							emoji={{ name: getEmojiByName("heavy_plus_sign") }}
+							emoji={{ name: emoji("heavy_plus_sign") }}
 							id={"calc-add"}
 						/>
 					</ActionRow>

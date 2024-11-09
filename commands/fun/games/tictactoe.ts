@@ -2,12 +2,12 @@ import { Command, CommandContext, Embed, User } from "harmony";
 import { currentGames, TicTacToeGame } from "tictactoe";
 
 export default class TicTacToe extends Command {
-	name = "tictactoe";
-	aliases = ["ttt", "tic-tac-toe"];
-	description = "Play tic-tac-toe with a friend or a computer!";
-	usage = "[user's mention or id]";
-	category = "fun";
-	async execute(ctx: CommandContext) {
+	override name = "tictactoe";
+	override aliases = ["ttt", "tic-tac-toe"];
+	override description = "Play tic-tac-toe with a friend or a computer!";
+	override usage = "[user's mention or id]";
+	override category = "fun";
+	override async execute(ctx: CommandContext) {
 		let targetPlayer: "ai" | User = "ai";
 		const userId = ctx.argString != ""
 			? /<@!?[0-9]{17,19}>/.test(ctx.argString.trim())
@@ -38,9 +38,7 @@ export default class TicTacToe extends Command {
 		const game = new TicTacToeGame(ctx.author, targetPlayer, ctx.client);
 
 		const { id } = await ctx.message.reply(undefined, {
-			embeds: [
-				game.Embed,
-			],
+			embeds: [game.Embed],
 			components: game.boardState,
 		});
 

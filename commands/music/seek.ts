@@ -3,17 +3,18 @@ import { doPermCheck, queues } from "queue";
 import { formatMs, toMs } from "tools";
 
 export default class Seek extends Command {
-	name = "seek";
-	aliases = ["skipto"];
-	category = "music";
-	description = "Seek to a specific time in the song";
+	override name = "seek";
+	override aliases = ["skipto"];
+	override category = "music";
+	override description = "Seek to a specific time in the song";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const queue = queues.get(ctx.guild.id);
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (
-			queue == undefined || botState == undefined ||
+			queue == undefined ||
+			botState == undefined ||
 			botState.channel == undefined
 		) {
 			await ctx.message.reply(undefined, {

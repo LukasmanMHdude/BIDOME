@@ -2,12 +2,12 @@ import { Command, CommandContext, Embed } from "harmony";
 import { queues } from "queue";
 
 export default class Queue extends Command {
-	name = "nowplaying";
-	aliases = ["np", "playing"];
-	category = "music";
-	description = "View the current song";
+	override name = "nowplaying";
+	override aliases = ["np", "playing"];
+	override category = "music";
+	override description = "View the current song";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (

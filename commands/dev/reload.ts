@@ -3,13 +3,19 @@ import { loopFilesAndReturn } from "tools";
 import { clearInteractions, loadInteractions } from "shared";
 
 export default class Reload extends Command {
-	name = "reload";
-	aliases = ["rl", "reloadcommand", "rlcmd", "reloadcmd", "rlcommand"];
-	description = "Reload a specific command";
-	category = "dev";
-	usage = "reload <command>";
-	ownerOnly = true;
-	async execute(ctx: CommandContext) {
+	override name = "reload";
+	override aliases = [
+		"rl",
+		"reloadcommand",
+		"rlcmd",
+		"reloadcmd",
+		"rlcommand",
+	];
+	override description = "Reload a specific command";
+	override category = "dev";
+	override usage = "reload <command>";
+	override ownerOnly = true;
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString === "") {
 			await ctx.message.reply(undefined, {
 				embeds: [

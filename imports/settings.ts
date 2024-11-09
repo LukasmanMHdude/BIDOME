@@ -11,7 +11,7 @@ export enum Feature {
 }
 
 export type GuildConfig = {
-	enabledBetaFeatures: (Feature)[];
+	enabledBetaFeatures: Feature[];
 	enabledFeatures: (Feature | typeof Feature)[];
 	suggestion_channel: string | null;
 	suggestion_accepted_channel: string | null;

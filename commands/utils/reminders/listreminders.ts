@@ -4,12 +4,12 @@ import { createEmbedFromLangData, getString, getUserLanguage } from "i18n";
 import { toMs } from "tools";
 
 export default class ListReminders extends Command {
-	name = "listreminders";
-	aliases = ["reminders"];
-	category = "utils";
-	description = "List your reminders";
+	override name = "listreminders";
+	override aliases = ["reminders"];
+	override category = "utils";
+	override description = "List your reminders";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		const lang = await getUserLanguage(ctx.author);
 		const reminders = await getReminders(ctx.author.id);
 		if (reminders.length == 0) {
@@ -29,8 +29,8 @@ export default class ListReminders extends Command {
 			});
 		} else {
 			if (ctx.argString != "") {
-				const reminder = reminders.find((r) =>
-					r.id?.toString() == ctx.argString
+				const reminder = reminders.find(
+					(r) => r.id?.toString() == ctx.argString,
 				);
 				if (reminder == undefined) {
 					// Peak laziness

@@ -7,37 +7,41 @@ import {
 import { format } from "tools";
 
 export default class SetStatus extends Command {
-	name = "setstatus";
-	ownerOnly = true;
-	category = "dev";
-	description = "Change the bot's status";
-	usage = "Setstatus <status>";
-	async execute(ctx: CommandContext) {
+	override name = "setstatus";
+	override ownerOnly = true;
+	override category = "dev";
+	override description = "Change the bot's status";
+	override usage = "Setstatus <status>";
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString === "") {
 			await ctx.message.reply(undefined, {
-				embeds: [new Embed({
-					author: {
-						name: "Bidome bot",
-						icon_url: ctx.message.client.user!.avatarURL(),
-					},
-					title: "Bot status",
-					description: "Please provide a status to change it to!",
-				}).setColor("random")],
+				embeds: [
+					new Embed({
+						author: {
+							name: "Bidome bot",
+							icon_url: ctx.message.client.user!.avatarURL(),
+						},
+						title: "Bot status",
+						description: "Please provide a status to change it to!",
+					}).setColor("random"),
+				],
 			});
 		} else {
 			const now = Date.now();
 			const message = await ctx.message.reply(undefined, {
-				embeds: [new Embed({
-					author: {
-						name: "Bidome bot",
-						icon_url: ctx.message.client.user!.avatarURL(),
-					},
-					title: "Bot status",
-					description: "Please select the status type!",
-					footer: {
-						text: "This will time out in 30 seconds!",
-					},
-				}).setColor("random")],
+				embeds: [
+					new Embed({
+						author: {
+							name: "Bidome bot",
+							icon_url: ctx.message.client.user!.avatarURL(),
+						},
+						title: "Bot status",
+						description: "Please select the status type!",
+						footer: {
+							text: "This will time out in 30 seconds!",
+						},
+					}).setColor("random"),
+				],
 				components: [
 					{
 						type: 1,
@@ -46,12 +50,14 @@ export default class SetStatus extends Command {
 							"WATCHING",
 							"LISTENING",
 							"COMPETING",
-						].map((status) => ({
-							type: 2,
-							label: format(status),
-							style: "BLURPLE",
-							customID: `${status.toLowerCase()}-${now}`,
-						})),
+						].map(
+							(status) => ({
+								type: 2,
+								label: format(status),
+								style: "BLURPLE",
+								customID: `${status.toLowerCase()}-${now}`,
+							}),
+						),
 					},
 				],
 			});
@@ -66,14 +72,16 @@ export default class SetStatus extends Command {
 			);
 			if (!choice[0]) {
 				await message.edit(undefined, {
-					embeds: [new Embed({
-						author: {
-							name: "Bidome bot",
-							icon_url: ctx.message.client.user!.avatarURL(),
-						},
-						title: "Bot status",
-						description: "Status change timed out!",
-					}).setColor("random")],
+					embeds: [
+						new Embed({
+							author: {
+								name: "Bidome bot",
+								icon_url: ctx.message.client.user!.avatarURL(),
+							},
+							title: "Bot status",
+							description: "Status change timed out!",
+						}).setColor("random"),
+					],
 					components: [],
 				});
 				return;
@@ -84,20 +92,25 @@ export default class SetStatus extends Command {
 					| "WATCHING"
 					| "LISTENING"
 					| "COMPETING";
-				ctx.client.setPresence({
-					type: type,
+
+				const presence = {
+					type,
 					name: ctx.argString,
 					status: ctx.client.presence.status,
-				});
+				};
+
+				ctx.client.setPresence(presence);
 				await message.edit(undefined, {
-					embeds: [new Embed({
-						author: {
-							name: "Bidome bot",
-							icon_url: ctx.message.client.user!.avatarURL(),
-						},
-						title: "Bot status",
-						description: "Status has been changed!",
-					}).setColor("random")],
+					embeds: [
+						new Embed({
+							author: {
+								name: "Bidome bot",
+								icon_url: ctx.message.client.user!.avatarURL(),
+							},
+							title: "Bot status",
+							description: "Status has been changed!",
+						}).setColor("random"),
+					],
 					components: [],
 				});
 			}

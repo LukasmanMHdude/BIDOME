@@ -24,12 +24,12 @@ const responses = [
 ];
 
 export default class Eightball extends Command {
-	name = "8ball";
-	description = "Just a regular 8ball";
-	aliases = ["magic8ball", "eightball", "magiceightball"];
-	usage = "8ball <question>";
-	category = "fun";
-	async execute(ctx: CommandContext) {
+	override name = "8ball";
+	override description = "Just a regular 8ball";
+	override aliases = ["magic8ball", "eightball", "magiceightball"];
+	override usage = "8ball <question>";
+	override category = "fun";
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString === "") {
 			await ctx.message.reply(undefined, {
 				embeds: [

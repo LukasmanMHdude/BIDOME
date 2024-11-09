@@ -2,18 +2,19 @@ import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
 
 export default class Shuffle extends Command {
-	name = "shuffle";
+	override name = "shuffle";
 	// Dankpods reference
-	aliases = ["mix", "shu-fle"];
-	category = "music";
-	description = "Shuffle the queue";
+	override aliases = ["mix", "shu-fle"];
+	override category = "music";
+	override description = "Shuffle the queue";
 
-	async execute(ctx: CommandContext) {
+	override async execute(ctx: CommandContext) {
 		if (ctx.guild == undefined) return;
 		const queue = queues.get(ctx.guild.id);
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (
-			queue == undefined || botState == undefined ||
+			queue == undefined ||
+			botState == undefined ||
 			botState.channel == undefined
 		) {
 			await ctx.message.reply(undefined, {

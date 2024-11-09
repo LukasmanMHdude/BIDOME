@@ -35,7 +35,7 @@ export const formatMs = (ms: number, long = false): string => {
 			`${hours > 0 ? `${hours < 10 ? `0${hours}` : hours}:` : ""}`,
 			`${minutes < 10 ? `0${minutes}` : minutes}:`,
 			`${seconds < 10 ? `0${seconds}` : seconds}`,
-			`${showMs ? `:${(ms < 10 ? `0${seconds}` : seconds)}` : ""}`,
+			`${showMs ? `:${ms < 10 ? `0${seconds}` : seconds}` : ""}`,
 		].join("");
 	}
 };

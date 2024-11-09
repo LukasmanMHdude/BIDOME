@@ -6,12 +6,12 @@ import {
 } from "harmony";
 
 export default class Dice extends Command {
-	name = "dice";
-	aliases = ["diceroll", "rolladice", "roll"];
-	category = "fun";
-	usage = "Dice [size]";
-	description = "Roll a Dice";
-	async execute(ctx: CommandContext) {
+	override name = "dice";
+	override aliases = ["diceroll", "rolladice", "roll"];
+	override category = "fun";
+	override usage = "Dice [size]";
+	override description = "Roll a Dice";
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString != "") {
 			const size = parseInt(ctx.argString);
 			if (!isNaN(size)) {

@@ -3,8 +3,8 @@ import { getReminders, removeReminder } from "settings";
 import { createEmbedFromLangData, getString, getUserLanguage } from "i18n";
 
 export default class DeleteReminder extends Command {
-	name = "deletereminder";
-	aliases = [
+	override name = "deletereminder";
+	override aliases = [
 		"deletereminders",
 
 		"delreminder",
@@ -18,9 +18,9 @@ export default class DeleteReminder extends Command {
 		"cancelreminder",
 		"cancelreminders",
 	];
-	category = "utils";
-	description = "Delete a reminder";
-	async execute(ctx: CommandContext) {
+	override category = "utils";
+	override description = "Delete a reminder";
+	override async execute(ctx: CommandContext) {
 		const lang = await getUserLanguage(ctx.author);
 		if (ctx.argString == "") {
 			await ctx.message.reply(undefined, {
@@ -39,9 +39,9 @@ export default class DeleteReminder extends Command {
 			});
 		} else {
 			const reminders = await getReminders();
-			const reminderIds = ctx.argString.split(/[ ,]/g).map((s) =>
-				s.startsWith("#") ? s.slice(1) : s
-			);
+			const reminderIds = ctx.argString
+				.split(/[ ,]/g)
+				.map((s) => (s.startsWith("#") ? s.slice(1) : s));
 			if (reminderIds.length > 1) {
 				const canceledReminders: string[] = [];
 
@@ -67,23 +67,25 @@ export default class DeleteReminder extends Command {
 								"commands.deletereminder.successBulk.title",
 								`${canceledReminders.length}/${reminderIds.length}`,
 							),
-							description: reminderIds.map((id) =>
-								getString(
-									lang,
-									`commands.deletereminder.successBulk.${
-										canceledReminders.includes(id)
-											? "success"
-											: "failure"
-									}`,
-									`#${id}`,
+							description: reminderIds
+								.map((id) =>
+									getString(
+										lang,
+										`commands.deletereminder.successBulk.${
+											canceledReminders.includes(id)
+												? "success"
+												: "failure"
+										}`,
+										`#${id}`,
+									)
 								)
-							).join("\n"),
+								.join("\n"),
 						}).setColor("random"),
 					],
 				});
 			} else {
-				const reminder = reminders.find((r) =>
-					r.id.toString() == ctx.argString
+				const reminder = reminders.find(
+					(r) => r.id.toString() == ctx.argString,
 				);
 				if (reminder == undefined) {
 					await ctx.message.reply(undefined, {

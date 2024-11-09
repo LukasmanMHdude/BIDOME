@@ -2,13 +2,13 @@ import { Command, CommandContext, Embed } from "harmony";
 import { loopFilesAndReturn } from "tools";
 
 export default class Load extends Command {
-	name = "load";
-	aliases = ["loadcommand", "loadcmd"];
-	description = "Load a specific command file";
-	category = "dev";
-	usage = "load <file>";
-	ownerOnly = true;
-	async execute(ctx: CommandContext) {
+	override name = "load";
+	override aliases = ["loadcommand", "loadcmd"];
+	override description = "Load a specific command file";
+	override category = "dev";
+	override usage = "load <file>";
+	override ownerOnly = true;
+	override async execute(ctx: CommandContext) {
 		if (ctx.argString === "") {
 			await ctx.message.reply(undefined, {
 				embeds: [

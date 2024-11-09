@@ -40,10 +40,7 @@ const getLogPrefix = () => {
 
 console.log = (...args) => {
 	logContent += `${getLogPrefix()} ${args.map(convertStr).join(" ")}\n`;
-	logFunction(
-		getLogPrefix(),
-		...args,
-	);
+	logFunction(getLogPrefix(), ...args);
 };
 
 const startNewInstance = async () => {
@@ -59,7 +56,9 @@ const startNewInstance = async () => {
 		if (
 			Deno.env.get("IS_LOCAL") == "true" ||
 			Deno.env.get("DISABLE_UPDATER") == "true"
-		) break;
+		) {
+			break;
+		}
 		const git = new Deno.Command("git", {
 			args: command.split(" "),
 			stdout: "piped",
