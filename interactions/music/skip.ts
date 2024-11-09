@@ -43,7 +43,11 @@ export async function button(i: MessageComponentInteraction) {
 			);
 
 			if (canVoteSkip) {
-				queue.player.skip();
+				const currentLoopState = queue.player.loop;
+				queue.player.setLoop("off");
+				// Skip for some reason ends the queue - This is a super jank workaround
+				queue.player.seek(queue.player.current.duration);
+				queue.player.setLoop(currentLoopState);
 
 				await i.respond({
 					embeds: [

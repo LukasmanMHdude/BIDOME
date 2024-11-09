@@ -84,13 +84,9 @@ export default class Play extends Command {
 							ctx.argString,
 						);
 
-				const searchString =
-					isLink || /(yt|sc)search\:/i.test(ctx.argString)
-						? ctx.argString
-						: `ytsearch:${ctx.argString}`;
-
 				const { loadType, tracks } = await nodes.search({
-					query: searchString,
+					query: ctx.argString,
+					source: isLink ? undefined : "youtube",
 					requester: ctx.author.id,
 				});
 
@@ -275,7 +271,7 @@ export default class Play extends Command {
 										} to the queue!`,
 									footer: {
 										text: `Songs in queue: ${
-											queue.player.queue.size +
+											queue.player.queue.size + 1 +
 											songsToAdd.length
 										}`,
 									},
@@ -296,8 +292,9 @@ export default class Play extends Command {
 										songsToAdd[0].title
 									}](${songsToAdd[0].url}) to the queue!`,
 									footer: {
-										text:
-											`Songs in queue: ${queue.player.queue.size}`,
+										text: `Songs in queue: ${
+											queue.player.queue.size + 1
+										}`,
 									},
 								}).setColor("random"),
 							],

@@ -39,7 +39,8 @@ export const nodes = new Manager({
 		retryDelay: 5 * 1000,
 	})),
 	options: {
-		clientName: "Bidome",
+		clientName: "Bidome/1.0.0",
+		NodeLinkFeatures: true,
 	},
 	sendPayload: async (guildID: string, payload: unknown) => {
 		const guild = await client.guilds.resolve(guildID);
@@ -94,14 +95,16 @@ nodes.on("trackEnd", (player, track, reason) => {
 export const doPermCheck = async (user: Member, channel: VoiceChannel) => {
 	// We do a bit of trolling
 	if (client.owners.includes(user.id)) return true;
-	if (
-		((await channel.voiceStates.array()) ?? []).filter((u) => !u.user.bot)
-			.length < 2
-	) {
-		return true;
-	}
 	if (user.permissions.has("ADMINISTRATOR")) return true;
 	if (channel.guild.ownerID === user.id) return true;
+
+	const users = ((await channel.voiceStates.array()) ?? []).filter(
+		(u) => !u.user.bot,
+	);
+	if (!users.map((u) => u.user.id).includes(user.id)) return false;
+	if (users.length < 2) {
+		return true;
+	}
 	const serverConfig = await getConfig(channel.guild);
 
 	if (serverConfig.djRole != undefined) {
@@ -138,8 +141,8 @@ export class ServerQueue {
 			guildId: this.guildId,
 			voiceChannelId: channelObject.id,
 			textChannelId: channel,
-			autoPlay: true,
-			autoLeave: true,
+			// autoPlay: true,
+			// autoLeave: true,
 		});
 
 		this.player.connect({
@@ -154,12 +157,17 @@ export class ServerQueue {
 				this.channel = newChannel;
 			},
 			trackEnd: () => {
-				console.log("Track ended");
 				if (this.player.queue.size == 0) {
 					this.deleteQueue();
 				}
 			},
 			trackStart: async () => {
+				if (!this.player.connected) {
+					this.player.connect({
+						setDeaf: true,
+					});
+				}
+
 				if (setAsSpeaker && this.firstSong) {
 					if (channelObject.type == ChannelTypes.GUILD_STAGE_VOICE) {
 						this.makeBotSpeak(channelObject);
@@ -202,11 +210,10 @@ export class ServerQueue {
 		queues.delete(this.guildId);
 		playerEventHandlers.delete(this.guildId);
 
-		if (this.player.playing) {
-			await this.player.stop({});
-		}
-
 		this.player.disconnect();
+		await this.player.stop({
+			destroy: true,
+		});
 	}
 
 	private async makeBotSpeak(channelObject: VoiceChannel) {
@@ -250,7 +257,7 @@ export class ServerQueue {
 	}
 
 	private play() {
-		if (this.player.queue.size < 1) return this.deleteQueue();
+		// if (this.player.queue.size < 1) return this.deleteQueue();
 		this.voteSkipUsers = [];
 
 		if (!this.player.playing) {
@@ -261,7 +268,12 @@ export class ServerQueue {
 	public get queueLength() {
 		let queueLength = 0;
 
-		for (const { duration } of this.player.queue.tracks) {
+		for (
+			const { duration } of [
+				this.player.current,
+				...this.player.queue.tracks,
+			]
+		) {
 			queueLength += duration;
 		}
 
@@ -294,7 +306,7 @@ export class ServerQueue {
 						name: "Bidome bot",
 						icon_url: client.user!.avatarURL(),
 					},
-					title: `Now Playing ${this.player.playing ? "y" : "n"}`,
+					title: `Now Playing`,
 					fields: [
 						{
 							name: "Song",
@@ -331,9 +343,9 @@ export class ServerQueue {
 						{
 							name: "Loop Status",
 							value: {
-								"off": "Off",
-								"track": "Song",
-								"queue": "Queue",
+								off: "Off",
+								track: "Song",
+								queue: "Queue",
 							}[this.player.loop],
 							inline: true,
 						},
@@ -342,10 +354,9 @@ export class ServerQueue {
 						url: song.artworkUrl,
 					},
 					footer: {
-						text:
-							`Songs in queue: ${this.player.queue.size} | Length: ${
-								formatMs(this.queueLength)
-							}`,
+						text: `Songs in queue: ${
+							this.player.queue.size + 1
+						} | Length: ${formatMs(this.queueLength)}`,
 					},
 				}).setColor("random"),
 			],
@@ -413,11 +424,12 @@ export const initLava = (bot: CommandClient) => {
 		console.log(`[Lavalink] Error on node ${node.identifier}:`, error);
 	});
 
-	bot.on("raw", (_, payload) => {
-		nodes.packetUpdate(payload);
-	});
-
 	console.log("[Lavalink] Initializing nodes");
+
+	// The full payload is simulated because harmony strips it for some reason
+	bot.on("raw", (evt, payload) => {
+		nodes.packetUpdate({ t: evt, s: 5, op: 0, d: payload });
+	});
 
 	nodes.init(bot.user!.id);
 };

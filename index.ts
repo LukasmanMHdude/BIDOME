@@ -74,9 +74,7 @@ let reconnectHandler: number | undefined;
 
 bot.on("gatewayError", (err) => {
 	console.log("Gateway error occured", err);
-	if (
-		err.message.startsWith("NetworkError")
-	) {
+	if (err.message.startsWith("NetworkError")) {
 		console.log("Error resolving DNS, attempting Automatic reconnects");
 		if (reconnectHandler == undefined) {
 			reconnectHandler = setInterval(async () => {
@@ -217,9 +215,9 @@ bot.once("ready", async () => {
 		}!`,
 	);
 
-	for await (const guild of bot.guilds) {
-		await guild.chunk({});
-	}
+	// for await (const guild of bot.guilds) {
+	// 	await guild.chunk({});
+	// }
 
 	setInterval(() => {
 		nextStatus();

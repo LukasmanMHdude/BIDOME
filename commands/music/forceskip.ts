@@ -45,7 +45,15 @@ export default class ForceSkip extends Command {
 				(await doPermCheck(ctx.member!, botState.channel!)) ||
 				queue.player.current.requestedBy == ctx.author.id
 			) {
-				queue.player.skip();
+				if (queue.player.queue.size == 0) {
+					queue.deleteQueue();
+				} else {
+					const currentLoopState = queue.player.loop;
+					queue.player.setLoop("off");
+					// Skip for some reason ends the queue - This is a super jank workaround
+					queue.player.seek(queue.player.current.duration);
+					queue.player.setLoop(currentLoopState);
+				}
 
 				await ctx.message.reply({
 					embeds: [

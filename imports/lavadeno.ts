@@ -1,4 +1,4 @@
-export * from "npm:moonlink.js";
+export * from "npm:moonlink.js@4.0.2";
 
 // Non exported types
 

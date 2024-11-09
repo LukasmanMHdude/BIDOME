@@ -12,7 +12,8 @@ export default class Skip extends Command {
 		const queue = queues.get(ctx.guild.id);
 		const botState = await ctx.guild!.voiceStates.get(ctx.client.user!.id);
 		if (
-			queue == undefined || botState == undefined ||
+			queue == undefined ||
+			botState == undefined ||
 			botState.channel == undefined
 		) {
 			await ctx.message.reply(undefined, {
@@ -48,7 +49,15 @@ export default class Skip extends Command {
 			);
 
 			if (canVoteSkip) {
-				queue.player.skip();
+				if (queue.player.queue.size == 0) {
+					queue.deleteQueue();
+				} else {
+					const currentLoopState = queue.player.loop;
+					queue.player.setLoop("off");
+					// Skip for some reason ends the queue - This is a super jank workaround
+					queue.player.seek(queue.player.current.duration);
+					queue.player.setLoop(currentLoopState);
+				}
 
 				await ctx.message.reply({
 					embeds: [
@@ -92,9 +101,9 @@ export default class Skip extends Command {
 									text: (await doPermCheck(
 											ctx.member!,
 											botState.channel,
-										) ||
+										)) ||
 											queue.player.current.requestedBy ==
-												ctx.author.id)
+												ctx.author.id
 										? "Use forceskip to skip without a vote"
 										: "",
 								},
