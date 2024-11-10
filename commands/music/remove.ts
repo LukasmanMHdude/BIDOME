@@ -71,9 +71,10 @@ export default class Remove extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Invalid argument",
-									description: `Please select the song's current position (1-${
-										queue.player.queue.size - 1
-									})`,
+									description:
+										`Please select the song's current position (1-${
+											queue.player.queue.size - 1
+										})`,
 								}).setColor("red"),
 							],
 						});
@@ -90,7 +91,8 @@ export default class Remove extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Removed song",
-									description: `Removed [${track.title}](${track.url}) from the queue!`,
+									description:
+										`Removed [${track.title}](${track.url}) from the queue!`,
 								}).setColor("green"),
 							],
 						});
