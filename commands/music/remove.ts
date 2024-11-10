@@ -61,7 +61,7 @@ export default class Remove extends Command {
 						ctx.argString == "" ||
 						isNaN(parseInt(ctx.argString)) ||
 						parseInt(ctx.argString) < 1 ||
-						parseInt(ctx.argString) > queue.player.queue.size
+						parseInt(ctx.argString) > queue.player.queue.size + 1
 					) {
 						await ctx.message.reply({
 							embeds: [
@@ -80,8 +80,8 @@ export default class Remove extends Command {
 						});
 					} else {
 						const position = parseInt(ctx.argString);
-						const track = queue.player.queue.get(position);
-						const _remove = queue.player.queue.remove(position);
+						const track = queue.player.queue.get(position - 1);
+						const _remove = queue.player.queue.remove(position - 1);
 
 						await ctx.message.reply({
 							embeds: [

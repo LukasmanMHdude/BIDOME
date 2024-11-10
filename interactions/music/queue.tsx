@@ -8,7 +8,7 @@ import {
 	MessageComponentInteraction,
 } from "harmony";
 import { emoji } from "emoji";
-import { queues } from "queue";
+import { playerEventHandlers, queues } from "queue";
 import { formatMs } from "tools";
 
 export async function button(i: MessageComponentInteraction) {
@@ -66,7 +66,10 @@ export async function button(i: MessageComponentInteraction) {
 								icon_url: i.client.user!.avatarURL(),
 							},
 							title: "Server queue",
-							description: queue.player.queue.tracks
+							description: [
+								queue.player.current,
+								...queue.player.queue.tracks,
+							]
 								.slice(startingValue, startingValue + 10)
 								.map(
 									({ title, url }, index) =>
@@ -83,9 +86,7 @@ export async function button(i: MessageComponentInteraction) {
 								icon_url: i.user.avatarURL(),
 								text:
 									`Songs in queue: ${queue.player.queue.size} | Length: ${
-										formatMs(
-											queue.queueLength,
-										)
+										formatMs(queue.queueLength)
 									}`,
 							},
 						}).setColor("random"),
