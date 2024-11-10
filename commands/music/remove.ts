@@ -42,7 +42,7 @@ export default class Remove extends Command {
 		} else {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (await doPermCheck(ctx.member!, botState.channel)) {
-				if (queue.player.queue.size < 2) {
+				if (queue.player.queue.size < 1) {
 					await ctx.message.reply({
 						embeds: [
 							new Embed({
@@ -71,10 +71,9 @@ export default class Remove extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Invalid argument",
-									description:
-										`Please select the song's current position (1-${
-											queue.player.queue.size - 1
-										})`,
+									description: `Please select the song's current position (1-${
+										queue.player.queue.size - 1
+									})`,
 								}).setColor("red"),
 							],
 						});
@@ -91,8 +90,7 @@ export default class Remove extends Command {
 										icon_url: ctx.client.user!.avatarURL(),
 									},
 									title: "Removed song",
-									description:
-										`Removed [${track.title}](${track.url}) from the queue!`,
+									description: `Removed [${track.title}](${track.url}) from the queue!`,
 								}).setColor("green"),
 							],
 						});
