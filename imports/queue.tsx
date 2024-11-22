@@ -14,7 +14,7 @@ import {
 	VoiceChannel,
 	type VoiceState,
 } from "./harmony.ts";
-import { Manager, Player, type Track, type TTrackEndType } from "./lavadeno.ts";
+import { type LilyTrack, LilyManager, LilyPlayer } from "./lavadeno.ts";
 import { formatMs } from "./tools.ts";
 import { emoji } from "./emoji.ts";
 import { getConfig } from "./settings.ts";
@@ -29,7 +29,7 @@ if (isNaN(nodesCount)) {
 	throw new Error("Invalid node count");
 }
 
-export const nodes = new Manager({
+export const nodes = new LilyManager({
 	nodes: new Array(nodesCount).fill(undefined).map((_, i) => ({
 		host: Deno.env.get(`LAVALINK_${i + 1}_HOST`)!,
 		port: parseInt(Deno.env.get(`LAVALINK_${i + 1}_PORT`)!),
@@ -40,7 +40,6 @@ export const nodes = new Manager({
 	})),
 	options: {
 		clientName: "Bidome/1.0.0",
-		NodeLinkFeatures: true,
 	},
 	sendPayload: async (guildID: string, payload: unknown) => {
 		const guild = await client.guilds.resolve(guildID);
@@ -54,13 +53,13 @@ export const nodes = new Manager({
 export const playerEventHandlers = new Map<
 	string,
 	{
-		trackStart: (track: Track) => Promise<void> | void;
+		trackStart: (track: LilyTrack) => Promise<void> | void;
 		playerMoved: (
 			oldChannel: string,
 			newChannel: string,
 		) => Promise<void> | void;
 		playerDisconnected: () => Promise<void> | void;
-		trackEnd: (track: Track, reason: TTrackEndType) => Promise<void> | void;
+		trackEnd: (track: LilyTrack, reason: string) => Promise<void> | void;
 	}
 >();
 
@@ -117,7 +116,7 @@ export const doPermCheck = async (user: Member, channel: VoiceChannel) => {
 };
 
 export class ServerQueue {
-	public readonly player: Player;
+	public readonly player: LilyPlayer;
 	public readonly guildId: string;
 	public voteSkipUsers: string[] = [];
 	public volume = 100;
@@ -144,7 +143,7 @@ export class ServerQueue {
 			textChannelId: channel,
 			// autoPlay: true,
 			// autoLeave: true,
-		});
+		})!;
 
 		this.player.connect({
 			setDeaf: true,
@@ -229,7 +228,7 @@ export class ServerQueue {
 		].patch({ channel_id: this.channel, suppress: false });
 	}
 
-	public addSongs(songs: Track | Track[]) {
+	public addSongs(songs: LilyTrack | LilyTrack[]) {
 		if (Array.isArray(songs)) {
 			for (const song of songs) {
 				this.player.queue.add(song);
@@ -273,8 +272,8 @@ export class ServerQueue {
 		for (
 			const { duration } of [
 				this.player.current,
-				...this.player.queue.tracks,
-			]
+				...this.player.queue.values(),
+			].filter((song) => song != undefined)
 		) {
 			queueLength += duration;
 		}
@@ -335,9 +334,9 @@ export class ServerQueue {
 							name: "Progress",
 							value: `${
 								formatMs(
-									(this.player.current.position ?? 0) < 1000
+									(this.player.current!.position ?? 0) < 1000
 										? 1000
-										: this.player.current.position!,
+										: this.player.current!.position!,
 								)
 							}/${formatMs(song.duration)}`,
 							inline: true,
@@ -431,7 +430,7 @@ export const initLava = (bot: CommandClient) => {
 			return;
 		}
 		// The full payload is simulated because harmony strips it for some reason
-		nodes.packetUpdate({ t: evt, d: payload });
+		nodes.packetUpdate({ t: evt as "VOICE_STATE_UPDATE" | "VOICE_SERVER_UPDATE", d: payload });
 	});
 
 	nodes.init(bot.user!.id);

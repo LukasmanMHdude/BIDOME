@@ -54,7 +54,7 @@ export default class Seek extends Command {
 					});
 				} else {
 					queue.player.seek(position);
-					queue.player.current.position = position;
+					queue.player.current!.position = position;
 
 					if (queue.queueMessage != undefined) {
 						queue.queueMessage.edit(queue.nowPlayingMessage);

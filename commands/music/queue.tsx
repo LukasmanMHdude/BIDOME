@@ -55,8 +55,8 @@ export default class Queue extends Command {
 				emoji("nine"),
 			];
 			const queueEntries = [
-				queue.player.current,
-				...queue.player.queue.tracks,
+				queue.player.current!,
+				...queue.player.queue.values(),
 			];
 
 			await ctx.message.reply(undefined, {

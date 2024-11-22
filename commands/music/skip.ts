@@ -1,5 +1,6 @@
 import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
+import { PlayerLoop } from "lavadeno";
 
 export default class Skip extends Command {
 	override name = "skip";
@@ -53,9 +54,9 @@ export default class Skip extends Command {
 					queue.deleteQueue();
 				} else {
 					const currentLoopState = queue.player.loop;
-					queue.player.setLoop("off");
+					queue.player.setLoop(PlayerLoop.OFF);
 					// Skip for some reason ends the queue - This is a super jank workaround
-					queue.player.seek(queue.player.current.duration);
+					await queue.player.skip();
 					queue.player.setLoop(currentLoopState);
 				}
 
@@ -102,7 +103,7 @@ export default class Skip extends Command {
 											ctx.member!,
 											botState.channel,
 										)) ||
-											queue.player.current.requestedBy ==
+											queue.player.current!.requestedBy as unknown as string ==
 												ctx.author.id
 										? "Use forceskip to skip without a vote"
 										: "",

@@ -9,7 +9,7 @@ import {
 	isMessageComponentInteraction,
 } from "harmony";
 import { doPermCheck, nodes, queues, ServerQueue } from "queue";
-import { Track } from "lavadeno";
+import { LilyTrack, Source } from "lavadeno";
 import { emoji } from "emoji";
 import { shuffleArray } from "tools";
 import { getEmote } from "i18n";
@@ -86,7 +86,7 @@ export default class Play extends Command {
 
 				const { loadType, tracks } = await nodes.search({
 					query: ctx.argString,
-					source: isLink ? undefined : "youtube",
+					source: isLink ? undefined : Source.YOUTUBE,
 					requester: ctx.author.id,
 				});
 
@@ -105,7 +105,7 @@ export default class Play extends Command {
 						],
 					});
 				} else {
-					let songsToAdd: Track[] = [];
+					let songsToAdd: LilyTrack[] = [];
 
 					if (isLink) {
 						switch (loadType) {
@@ -118,7 +118,7 @@ export default class Play extends Command {
 											.split(" ")[0],
 									)
 								) {
-									const tracks: Track[] = [];
+									const tracks: LilyTrack[] = [];
 
 									for (const track of tracks) {
 										songsToAdd.push(track);

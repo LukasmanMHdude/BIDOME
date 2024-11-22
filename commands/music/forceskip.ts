@@ -1,5 +1,6 @@
 import { Command, CommandContext, Embed } from "harmony";
 import { doPermCheck, queues } from "queue";
+import { PlayerLoop } from "lavadeno";
 
 export default class ForceSkip extends Command {
 	override name = "forceskip";
@@ -43,15 +44,14 @@ export default class ForceSkip extends Command {
 			const queue = queues.get(ctx.guild!.id)!;
 			if (
 				(await doPermCheck(ctx.member!, botState.channel!)) ||
-				queue.player.current.requestedBy == ctx.author.id
+				queue.player.current!.requestedBy as unknown as string == ctx.author.id
 			) {
 				if (queue.player.queue.size == 0) {
 					queue.deleteQueue();
 				} else {
 					const currentLoopState = queue.player.loop;
-					queue.player.setLoop("off");
-					// Skip for some reason ends the queue - This is a super jank workaround
-					queue.player.seek(queue.player.current.duration);
+					queue.player.setLoop(PlayerLoop.OFF);
+					await queue.player.skip();
 					queue.player.setLoop(currentLoopState);
 				}
 
