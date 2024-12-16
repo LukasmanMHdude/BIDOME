@@ -246,6 +246,26 @@ export default class Play extends Command {
 						}
 					}
 
+					const bannedSongIDs = ["vhpxylukBxo"];
+
+					for (const song of songsToAdd) {
+						if (song.url == undefined) continue;
+						const url = new URL(song.url);
+						const id = url.searchParams.get("v");
+						if (id != null && bannedSongIDs.includes(id)) {
+							await message.edit(undefined, {
+								embeds: [
+									new Embed({
+										title: "no",
+										description: "nice try"
+									}).setColor("red")
+								],
+								components: []
+							});	
+							return;
+						}
+					}
+
 					const isNewQueue = queues.has(ctx.guild.id);
 					const queue: ServerQueue = isNewQueue
 						? queues.get(ctx.guild.id)!
