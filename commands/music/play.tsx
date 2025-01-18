@@ -86,8 +86,12 @@ export default class Play extends Command {
 
 				const { loadType, tracks } = await nodes.search({
 					query: ctx.argString,
-					source: isLink ? undefined : Source.YOUTUBE,
 					requester: ctx.author.id,
+					source: isLink
+						? ctx.argString.includes("youtu")
+							? Source.YOUTUBE
+							: undefined
+						: Source.YOUTUBE,
 				});
 
 				if (loadType == "error" || loadType == "empty") {

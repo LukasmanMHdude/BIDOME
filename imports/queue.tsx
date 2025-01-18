@@ -432,6 +432,6 @@ export const initLava = (bot: CommandClient) => {
 		// The full payload is simulated because harmony strips it for some reason
 		nodes.packetUpdate({ t: evt as "VOICE_STATE_UPDATE" | "VOICE_SERVER_UPDATE", d: payload });
 	});
-
+	
 	nodes.init(bot.user!.id);
 };
