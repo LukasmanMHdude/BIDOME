@@ -14,7 +14,7 @@ import {
 	VoiceChannel,
 	type VoiceState,
 } from "./harmony.ts";
-import { type LilyTrack, LilyManager, LilyPlayer } from "./lavadeno.ts";
+import { LilyManager, LilyPlayer, type LilyTrack } from "./lavadeno.ts";
 import { formatMs } from "./tools.ts";
 import { emoji } from "./emoji.ts";
 import { getConfig } from "./settings.ts";
@@ -59,7 +59,6 @@ export const playerEventHandlers = new Map<
 			newChannel: string,
 		) => Promise<void> | void;
 		playerDisconnected: () => Promise<void> | void;
-		trackEnd: (track: LilyTrack, reason: string) => Promise<void> | void;
 	}
 >();
 
@@ -82,13 +81,6 @@ nodes.on("playerDisconnected", (player) => {
 	queues.get(player.guildId)?.deleteQueue();
 	if (handlers != undefined) {
 		handlers.playerDisconnected();
-	}
-});
-
-nodes.on("trackEnd", (player, track, reason) => {
-	const handlers = playerEventHandlers.get(player.guildId);
-	if (handlers != undefined) {
-		handlers.trackEnd(track, reason);
 	}
 });
 
@@ -141,8 +133,7 @@ export class ServerQueue {
 			guildId: this.guildId,
 			voiceChannelId: channelObject.id,
 			textChannelId: channel,
-			// autoPlay: true,
-			// autoLeave: true,
+			autoLeave: true,
 		})!;
 
 		this.player.connect({
@@ -155,11 +146,6 @@ export class ServerQueue {
 			},
 			playerMoved: (_, newChannel) => {
 				this.channel = newChannel;
-			},
-			trackEnd: () => {
-				if (this.player.queue.size == 0) {
-					this.deleteQueue();
-				}
 			},
 			trackStart: async () => {
 				if (!this.player.connected) {
@@ -430,8 +416,11 @@ export const initLava = (bot: CommandClient) => {
 			return;
 		}
 		// The full payload is simulated because harmony strips it for some reason
-		nodes.packetUpdate({ t: evt as "VOICE_STATE_UPDATE" | "VOICE_SERVER_UPDATE", d: payload });
+		nodes.packetUpdate({
+			t: evt as "VOICE_STATE_UPDATE" | "VOICE_SERVER_UPDATE",
+			d: payload,
+		});
 	});
-	
+
 	nodes.init(bot.user!.id);
 };
