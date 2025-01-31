@@ -36,7 +36,7 @@ export const nodes = new LilyManager({
 		password: Deno.env.get(`LAVALINK_${i + 1}_PASSWORD`)!,
 		secure: Deno.env.get(`LAVALINK_${i + 1}_SECURE`) == "true",
 		identifier: Deno.env.get(`LAVALINK_${i + 1}_NAME`)!,
-		retryDelay: 5 * 1000,
+		retryDelay: 60 * 1000,
 	})),
 	options: {
 		clientName: "Bidome/1.0.0",
